@@ -14,10 +14,30 @@
   "contributes": {
     "commands": [
       {
-        "command": "faves.helloWorld",
-        "title": "Hello World"
+        "command": "faves.add",
+        "title": "Faves: Add to favorites",
+        "icon": "$(star)"
+      },
+      {
+        "command": "faves.remove",
+        "title": "Faves: Remove from favorites"
+      },
+      {
+        "command": "faves.toggle",
+        "title": "Faves: Add or remove the file from favorites"
+      },
+      {
+        "command": "faves.search",
+        "title": "Faves: Search"
       }
-    ]
+    ],
+    "menus": {
+      "editor/title/run": [
+        {
+          "command": "faves.add"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

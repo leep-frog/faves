@@ -41,8 +41,14 @@ export class FavesManager {
   }
 
   async add(f: vscode.Uri): Promise<void> {
-    this.faves.set(this.pth(f), {path: this.pth(f)});
-    return await this.updateConfiguration();
+    const p: string = this.pth(f);
+    if (this.faves.has(p)) {
+      vscode.window.showInformationMessage("File already exists in favorites");
+    } else {
+      vscode.window.showInformationMessage("Adding file to favorites");
+      this.faves.set(this.pth(f), {path: this.pth(f)});
+      return await this.updateConfiguration();
+    }
   }
 
   async remove(f: vscode.Uri): Promise<void> {
@@ -50,8 +56,13 @@ export class FavesManager {
   }
 
   async removePath(path: string): Promise<void> {
-    this.faves.delete(path);
-    return await this.updateConfiguration();
+    if (!this.faves.has(path)) {
+      vscode.window.showInformationMessage("File already removed from favorites");
+    } else {
+      vscode.window.showInformationMessage("Removing file from favorites");
+      this.faves.delete(path);
+      return await this.updateConfiguration();
+    }
   }
 
   pth(f: vscode.Uri): string {

@@ -36,11 +36,6 @@
         {
           "command": "faves.toggle"
         }
-      ],
-      "editor/title/context": [
-        {
-          "command": "faves.toggle"
-        }
       ]
     },
     "configuration": {

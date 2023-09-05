@@ -5,6 +5,16 @@ interface Fave {
   path: string;
 };
 
+class RemoveFaveButton implements vscode.QuickInputButton {
+  readonly iconPath: vscode.ThemeIcon;
+  readonly tooltip?: string;
+  constructor() {
+    this.iconPath = new vscode.ThemeIcon("close");
+    this.tooltip = "Remove file from favorites list";
+  }
+}
+
+
 interface FaveQuickPickItem  extends vscode.QuickPickItem, Fave {};
 
 // Note: we use a function (rather than having Fave extend QuickPickItem),
@@ -14,12 +24,11 @@ function faveToQuickPick(fave: Fave): FaveQuickPickItem {
     ...fave,
     label: basename(fave.path),
     description: dirname(fave.path),
+    buttons: [
+      new RemoveFaveButton(),
+    ],
   };
 }
-
-interface FavesConfiguration {
-  favorites: Fave[];
-};
 
 export class FavesManager {
 
@@ -37,7 +46,11 @@ export class FavesManager {
   }
 
   async remove(f: vscode.Uri): Promise<void> {
-    this.faves.delete(this.pth(f));
+    this.removePath(this.pth(f));
+  }
+
+  async removePath(path: string): Promise<void> {
+    this.faves.delete(path);
     return await this.updateConfiguration();
   }
 
@@ -62,11 +75,42 @@ export class FavesManager {
       vscode.window.showInformationMessage("No favorites exist in this workspace");
       return;
     }
-    const item = await vscode.window.showQuickPick(this.orderedFaves().map(faveToQuickPick));
-    if (!item) {
-      return;
-    }
-    vscode.window.showInformationMessage(`Picked item: ${item.path}`);
+
+    const disposables: vscode.Disposable[] = [];
+    const input = vscode.window.createQuickPick<FaveQuickPickItem>();
+    input.items = this.orderedFaves().map(faveToQuickPick);
+    input.buttons = [
+      // This is for global buttons (not item specific)
+    ];
+    input.placeholder = "Search favorited files";
+    disposables.push(
+      input.onDidTriggerItemButton(event => {
+        input.items = input.items.filter(item => item.path !== event.item.path);
+        this.removePath(event.item.path);
+      }),
+      input.onDidHide(e => {
+        disposables.forEach(d => d.dispose);
+      }),
+      input.onDidAccept(e => {
+        switch (input.selectedItems.length) {
+        case 0:
+          vscode.window.showInformationMessage("No selection made");
+          break;
+        case 1:
+          const uri: vscode.Uri = vscode.Uri.from({
+            scheme: "file",
+            path: input.selectedItems[0].path,
+          });
+          vscode.window.showTextDocument(uri);
+          break;
+        default:
+          vscode.window.showInformationMessage("Multiple selections made?!?!?");
+          break;
+        }
+        input.dispose();
+      }),
+    );
+    input.show();
   }
 
   reload(): void {

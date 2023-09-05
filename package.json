@@ -24,7 +24,7 @@
       {
         "command": "faves.toggle",
         "title": "Faves: Toggle favorite bit for file",
-        "icon": "$(star)"
+        "icon": "$(star-full)"
       },
       {
         "command": "faves.search",

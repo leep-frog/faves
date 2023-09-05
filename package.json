@@ -15,8 +15,7 @@
     "commands": [
       {
         "command": "faves.add",
-        "title": "Faves: Add to favorites",
-        "icon": "$(star)"
+        "title": "Faves: Add to favorites"
       },
       {
         "command": "faves.remove",
@@ -24,7 +23,8 @@
       },
       {
         "command": "faves.toggle",
-        "title": "Faves: Add or remove the file from favorites"
+        "title": "Faves: Toggle favorite bit for file",
+        "icon": "$(star)"
       },
       {
         "command": "faves.search",
@@ -34,12 +34,12 @@
     "menus": {
       "editor/title/run": [
         {
-          "command": "faves.add"
+          "command": "faves.toggle"
         }
       ],
       "editor/title/context": [
         {
-          "command": "faves.add"
+          "command": "faves.toggle"
         }
       ]
     },
@@ -55,9 +55,9 @@
             "type": "object",
             "description": "Data for a specific favorited item",
             "properties": {
-              "uri": {
-                "type": "object",
-                "description": "VSCode URI reference"
+              "path": {
+                "type": "string",
+                "description": "File path"
               }
             }
           }

@@ -58,6 +58,10 @@ export class FavesManager {
   }
 
   async select() {
+    if (this.faves.size === 0) {
+      vscode.window.showInformationMessage("No favorites exist in this workspace");
+      return;
+    }
     const item = await vscode.window.showQuickPick(this.orderedFaves().map(faveToQuickPick));
     if (!item) {
       return;

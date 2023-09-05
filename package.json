@@ -36,7 +36,33 @@
         {
           "command": "faves.add"
         }
+      ],
+      "editor/title/context": [
+        {
+          "command": "faves.add"
+        }
       ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "Faves",
+      "properties": {
+        "faves.favorites": {
+          "type": "array",
+          "default": [],
+          "description": "List of favorited files",
+          "items": {
+            "type": "object",
+            "description": "Data for a specific favorited item",
+            "properties": {
+              "uri": {
+                "type": "object",
+                "description": "VSCode URI reference"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "scripts": {

@@ -23,7 +23,9 @@ function faveToQuickPick(fave: Fave): FaveQuickPickItem {
   return {
     ...fave,
     label: basename(fave.path),
-    description: dirname(fave.path),
+    // matchOnDescription only matches on label OR description, hence why
+    // we need to use `fave.path` (instead of `dirname(fave.path)`) here.
+    description: fave.path,
     buttons: [
       new RemoveFaveButton(),
     ],
@@ -33,7 +35,7 @@ function faveToQuickPick(fave: Fave): FaveQuickPickItem {
 export class FavesManager {
 
   faves: Map<string, Fave>;
-  eventEmitter: vscode.EventEmitter<void> = new vscode.EventEmitter<void>()
+  eventEmitter: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
 
   constructor() {
     this.faves = new Map<string, Fave>();
@@ -89,6 +91,7 @@ export class FavesManager {
 
     const disposables: vscode.Disposable[] = [];
     const input = vscode.window.createQuickPick<FaveQuickPickItem>();
+    input.matchOnDescription = true;
     input.items = this.orderedFaves().map(faveToQuickPick);
     input.buttons = [
       // This is for global buttons (not item specific)

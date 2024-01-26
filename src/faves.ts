@@ -1,4 +1,5 @@
 import { basename, dirname } from 'path';
+import path = require('path');
 import * as vscode from 'vscode';
 
 interface Fave {
@@ -20,12 +21,17 @@ interface FaveQuickPickItem  extends vscode.QuickPickItem, Fave {};
 // Note: we use a function (rather than having Fave extend QuickPickItem),
 // to ensure we don't write unnecessary data to settings
 function faveToQuickPick(fave: Fave): FaveQuickPickItem {
+  const wsFolder = vscode.workspace.getWorkspaceFolder(vscode.Uri.from({
+    scheme: "file",
+    path: fave.path,
+  }));
+  const numWsFolders = vscode.workspace.workspaceFolders?.length;
   return {
     ...fave,
     label: basename(fave.path),
     // matchOnDescription only matches on label OR description, hence why
     // we need to use `fave.path` (instead of `dirname(fave.path)`) here.
-    description: fave.path,
+    description: wsFolder ? `${numWsFolders === 1 ? `` : `${wsFolder.name} ● `}${path.relative(wsFolder.uri.path, fave.path)}` : fave.path,
     buttons: [
       new RemoveFaveButton(),
     ],

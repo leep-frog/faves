@@ -1,6 +1,7 @@
-import { basename, dirname } from 'path';
-import path = require('path');
+import { existsSync, lstatSync } from 'fs';
+import { basename } from 'path';
 import * as vscode from 'vscode';
+import path = require('path');
 
 interface Fave {
   path: string;
@@ -31,14 +32,19 @@ function faveToQuickPick(fave: Fave): FaveQuickPickItem {
     label: basename(fave.path),
     // matchOnDescription only matches on label OR description, hence why
     // we need to use `fave.path` (instead of `dirname(fave.path)`) here.
-    description: wsFolder ? `${numWsFolders === 1 ? `` : `${wsFolder.name} ● `}${path.relative(wsFolder.uri.path, fave.path)}` : fave.path,
+    description: wsFolder ? `${numWsFolders === 1 ? `` : `${wsFolder.name} ● `}${path.relative(wsFolder.uri.fsPath, fave.path)}` : fave.path,
     buttons: [
       new RemoveFaveButton(),
     ],
   };
 }
 
-export class FavesManager {
+abstract class FavesManager {
+
+  abstract readonly subsection: string;
+  abstract readonly configurationTarget: vscode.ConfigurationTarget;
+  abstract uriToPath(uri: vscode.Uri): string;
+  abstract pathToUri(path: string): vscode.Uri | undefined;
 
   faves: Map<string, Fave>;
   eventEmitter: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
@@ -49,18 +55,18 @@ export class FavesManager {
   }
 
   async add(f: vscode.Uri): Promise<void> {
-    const p: string = this.pth(f);
+    const p: string = this.uriToPath(f);
     if (this.faves.has(p)) {
       vscode.window.showInformationMessage("File already exists in favorites");
     } else {
       vscode.window.showInformationMessage("Adding file to favorites");
-      this.faves.set(this.pth(f), {path: this.pth(f)});
+      this.faves.set(this.uriToPath(f), {path: this.uriToPath(f)});
       return await this.updateConfiguration();
     }
   }
 
   async remove(f: vscode.Uri): Promise<void> {
-    this.removePath(this.pth(f));
+    this.removePath(this.uriToPath(f));
   }
 
   async removePath(path: string): Promise<void> {
@@ -73,12 +79,8 @@ export class FavesManager {
     }
   }
 
-  pth(f: vscode.Uri): string {
-    return f.path;
-  }
-
   toggle(f: vscode.Uri) {
-    if (this.faves.has(this.pth(f))) {
+    if (this.faves.has(this.uriToPath(f))) {
       this.remove(f);
     } else {
       this.add(f);
@@ -117,11 +119,10 @@ export class FavesManager {
           vscode.window.showInformationMessage("No selection made");
           break;
         case 1:
-          const uri: vscode.Uri = vscode.Uri.from({
-            scheme: "file",
-            path: input.selectedItems[0].path,
-          });
-          vscode.window.showTextDocument(uri);
+          const uri = this.pathToUri(input.selectedItems[0].path);
+          if (uri) {
+            vscode.window.showTextDocument(uri);
+          } // No else because the pathToUri should output an error message
           break;
         default:
           vscode.window.showInformationMessage("Multiple selections made?!?!?");
@@ -135,14 +136,75 @@ export class FavesManager {
 
   reload(): void {
     const config = vscode.workspace.getConfiguration("faves", vscode.window.activeTextEditor?.document.uri);
-    const favorites = config.get<Fave[]>("favorites");
+    const favorites = config.get<Fave[]>(this.subsection);
     this.faves = new Map(favorites?.map(fave => [fave.path, fave]));
   }
 
   private updateConfiguration(): Promise<void> {
-    vscode.workspace.getConfiguration("faves").update("favorites", this.orderedFaves(), vscode.ConfigurationTarget.Workspace, true).then(undefined, (reason: any) => {
+    vscode.workspace.getConfiguration("faves").update(this.subsection, this.orderedFaves(), this.configurationTarget, true).then(undefined, (reason: any) => {
       vscode.window.showInformationMessage(`Failed to update favorites: ${reason}`);
     });
     return Promise.resolve();
+  }
+}
+
+export class WorkspaceFavesManager extends FavesManager {
+  readonly subsection: string = "favorites";
+  readonly configurationTarget: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Workspace;
+
+  uriToPath(uri: vscode.Uri): string {
+    return uri.fsPath;
+  }
+
+  pathToUri(path: string): vscode.Uri {
+    return vscode.Uri.from({
+      scheme: "file",
+      path,
+    });
+  }
+}
+
+export class GlobalFavesManager extends FavesManager {
+  readonly subsection: string = "globalFavorites";
+  readonly configurationTarget: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
+
+  uriToPath(uri: vscode.Uri): string {
+    const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
+    if (!workspaceFolder) {
+      throw new Error("No workspace folder for given URI!");
+    }
+    return path.relative(workspaceFolder.uri.fsPath, uri.fsPath);
+  }
+
+  pathToUri(favePath: string): vscode.Uri | undefined {
+    const uris: vscode.Uri[] = [];
+    for (const workspaceFolder of (vscode.workspace.workspaceFolders || [])) {
+
+      const joinedPath = path.join(workspaceFolder.uri.fsPath, favePath);
+      if (!existsSync(joinedPath)) {
+        continue;
+      }
+
+      const stat = lstatSync(joinedPath);
+      if (!stat.isFile()) {
+        continue;
+      }
+
+      uris.push(vscode.Uri.from({
+          scheme: "file",
+          path: joinedPath,
+      }));
+    }
+
+    switch (uris.length) {
+    case 0:
+      vscode.window.showErrorMessage(`No files in this workspace match this pattern`);
+      return;
+    case 1:
+      return uris.at(0)!;
+    default:
+      vscode.window.showErrorMessage(`Multiple files in this workspace match this pattern`);
+      return;
+    }
   }
 }

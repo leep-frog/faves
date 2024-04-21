@@ -34,12 +34,32 @@
       {
         "command": "faves.search",
         "title": "Faves: Search"
+      },
+      {
+        "command": "faves.globalAdd",
+        "title": "Faves: [Global] Add to favorites"
+      },
+      {
+        "command": "faves.globalRemove",
+        "title": "Faves: [Global] Remove from favorites"
+      },
+      {
+        "command": "faves.globalToggle",
+        "title": "Faves: [Global] Toggle favorite bit for file",
+        "icon": "$(star-full)"
+      },
+      {
+        "command": "faves.globalSearch",
+        "title": "Faves: [Global] Search"
       }
     ],
     "menus": {
       "editor/title/run": [
         {
           "command": "faves.toggle"
+        },
+        {
+          "command": "faves.globalToggle"
         }
       ]
     },
@@ -51,6 +71,21 @@
           "type": "array",
           "default": [],
           "description": "List of favorited files",
+          "items": {
+            "type": "object",
+            "description": "Data for a specific favorited item",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "File path"
+              }
+            }
+          }
+        },
+        "faves.globalFavorites": {
+          "type": "array",
+          "default": [],
+          "description": "List of globally favorited files",
           "items": {
             "type": "object",
             "description": "Data for a specific favorited item",

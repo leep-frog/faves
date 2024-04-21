@@ -1,9 +1,10 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { FavesManager } from './faves';
+import { GlobalFavesManager, WorkspaceFavesManager } from './faves';
 
-const faves = new FavesManager();
+const workspaceFaves = new WorkspaceFavesManager();
+const globalFaves = new GlobalFavesManager();
 
 function uriExecutor(handler: (u: vscode.Uri) => void): (u: vscode.Uri | undefined) => void {
   return (u: vscode.Uri | undefined) => {
@@ -30,17 +31,26 @@ function executeOnUri(handler: (u: vscode.Uri) => void, uri?: vscode.Uri): void 
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-	context.subscriptions.push(vscode.commands.registerCommand('faves.add', uriExecutor((u: vscode.Uri) => (faves.add(u)))));
-  context.subscriptions.push(vscode.commands.registerCommand('faves.remove', uriExecutor((u: vscode.Uri) => (faves.remove(u)))));
-  context.subscriptions.push(vscode.commands.registerCommand('faves.toggle', uriExecutor((u: vscode.Uri) => (faves.toggle(u)))));
+	context.subscriptions.push(vscode.commands.registerCommand('faves.add', uriExecutor((u: vscode.Uri) => (workspaceFaves.add(u)))));
+  context.subscriptions.push(vscode.commands.registerCommand('faves.remove', uriExecutor((u: vscode.Uri) => (workspaceFaves.remove(u)))));
+  context.subscriptions.push(vscode.commands.registerCommand('faves.toggle', uriExecutor((u: vscode.Uri) => (workspaceFaves.toggle(u)))));
 
   context.subscriptions.push(vscode.commands.registerCommand('faves.search', () => {
-    faves.select();
+    workspaceFaves.select();
+  }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('faves.globalAdd', uriExecutor((u: vscode.Uri) => (globalFaves.add(u)))));
+  context.subscriptions.push(vscode.commands.registerCommand('faves.globalRemove', uriExecutor((u: vscode.Uri) => (globalFaves.remove(u)))));
+  context.subscriptions.push(vscode.commands.registerCommand('faves.globalToggle', uriExecutor((u: vscode.Uri) => (globalFaves.toggle(u)))));
+
+  context.subscriptions.push(vscode.commands.registerCommand('faves.globalSearch', () => {
+    globalFaves.select();
   }));
 
   vscode.workspace.onDidChangeConfiguration(e => {
     if (e.affectsConfiguration("faves")) {
-      faves.reload();
+      workspaceFaves.reload();
+      globalFaves.reload();
     }
   });
 }

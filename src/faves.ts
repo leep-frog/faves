@@ -41,15 +41,19 @@ function faveToQuickPick(fave: Fave): FaveQuickPickItem {
 
 abstract class FavesManager {
 
-  abstract readonly subsection: string;
-  abstract readonly configurationTarget: vscode.ConfigurationTarget;
   abstract uriToPath(uri: vscode.Uri): string;
   abstract pathToUri(path: string): vscode.Uri | undefined;
+
+  // These fields used to be abstract, but would be undefined on first initialization (so reload would fail).
+  readonly subsection: string;
+  readonly configurationTarget: vscode.ConfigurationTarget;
 
   faves: Map<string, Fave>;
   eventEmitter: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
 
-  constructor() {
+  constructor(subsection: string, configurationTarget: vscode.ConfigurationTarget) {
+    this.subsection = subsection;
+    this.configurationTarget = configurationTarget;
     this.faves = new Map<string, Fave>();
     this.reload();
   }
@@ -137,7 +141,11 @@ abstract class FavesManager {
   reload(): void {
     const config = vscode.workspace.getConfiguration("faves", vscode.window.activeTextEditor?.document.uri);
     const favorites = config.get<Fave[]>(this.subsection);
-    this.faves = new Map(favorites?.map(fave => [fave.path, fave]));
+    // We need to type-define this keyValueList (vs inline in `new Map(...)`) because typescript does some
+    // weird type assumptions which results in an empty map initialization otherwise.
+    // (or maybe just need the `|| []`). That seems to solve, but sticking with this just in case.
+    const keyValueList: [string, Fave][] = (favorites?.map(fave => [fave.path, fave]) || []);
+    this.faves = new Map(keyValueList);
   }
 
   private updateConfiguration(): Promise<void> {
@@ -149,8 +157,10 @@ abstract class FavesManager {
 }
 
 export class WorkspaceFavesManager extends FavesManager {
-  readonly subsection: string = "favorites";
-  readonly configurationTarget: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Workspace;
+
+  constructor() {
+    super("favorites", vscode.ConfigurationTarget.Workspace);
+  }
 
   uriToPath(uri: vscode.Uri): string {
     return uri.fsPath;
@@ -165,8 +175,10 @@ export class WorkspaceFavesManager extends FavesManager {
 }
 
 export class GlobalFavesManager extends FavesManager {
-  readonly subsection: string = "globalFavorites";
-  readonly configurationTarget: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
+
+  constructor() {
+    super("globalFavorites", vscode.ConfigurationTarget.Global);
+  }
 
   uriToPath(uri: vscode.Uri): string {
     const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);

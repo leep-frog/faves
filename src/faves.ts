@@ -5,6 +5,7 @@ import path = require('path');
 
 interface Fave {
   path: string;
+  alias?: string;
 };
 
 class RemoveFaveButton implements vscode.QuickInputButton {
@@ -22,7 +23,7 @@ interface FaveItem extends vscode.QuickPickItem {
   manager: FavesManager;
 }
 
-export async function searchFaves(managers: FavesManager[]) {
+export async function searchFaves(managers: FavesManager[], useAlias: boolean) {
 
   const items: FaveItem[] = [];
   for (const manager of managers) {
@@ -48,19 +49,34 @@ export async function searchFaves(managers: FavesManager[]) {
         }
 
         // Construct the quick pick item
-        const item: FaveItem = {
-          fave,
-          uri,
-          manager,
-          label: basename(fave.path),
-          iconPath: manager.itemIcon(),
-          description: descriptionParts.filter(s => !!s).join(" ● "),
-          buttons: [
-            new RemoveFaveButton(),
-          ]
-        };
-
-        items.push(item);
+        if (useAlias) {
+          if (fave.alias) {
+            descriptionParts.push(basename(fave.path));
+            items.push({
+              fave,
+              uri,
+              manager,
+              label: fave.alias,
+              iconPath: manager.itemIcon(),
+              description: descriptionParts.filter(s => !!s).join(" ● "),
+              buttons: [
+                new RemoveFaveButton(),
+              ]
+            });
+          }
+        } else {
+          items.push({
+            fave,
+            uri,
+            manager,
+            label: basename(fave.path),
+            iconPath: manager.itemIcon(),
+            description: descriptionParts.filter(s => !!s).join(" ● "),
+            buttons: [
+              new RemoveFaveButton(),
+            ]
+          });
+        }
       });
     });
   }
@@ -140,12 +156,19 @@ abstract class FavesManager {
   }
 
   async add(f: vscode.Uri): Promise<void> {
+    const alias = await vscode.window.showInputBox({
+      placeHolder: "alias (leave blank for no alias)",
+      prompt: "Fave alias",
+    });
     const p: string = this.uriToPath(f);
     if (this.faves.has(p)) {
       vscode.window.showInformationMessage("File already exists in favorites");
     } else {
       vscode.window.showInformationMessage("Adding file to favorites");
-      this.faves.set(p, {path: p});
+      this.faves.set(p, {
+        path: p,
+        alias,
+      });
       return await this.updateConfiguration();
     }
   }

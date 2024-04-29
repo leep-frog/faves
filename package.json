@@ -70,10 +70,15 @@
           "items": {
             "type": "object",
             "description": "Data for a specific favorited item",
+            "required": ["path"],
             "properties": {
               "path": {
                 "type": "string",
                 "description": "File path"
+              },
+              "alias": {
+                "type": "string",
+                "description": "Alias to use for the file"
               }
             }
           }
@@ -85,10 +90,15 @@
           "items": {
             "type": "object",
             "description": "Data for a specific favorited item",
+            "required": ["path"],
             "properties": {
               "path": {
                 "type": "string",
                 "description": "File path"
+              },
+              "alias": {
+                "type": "string",
+                "description": "Alias to use for the file"
               }
             }
           }

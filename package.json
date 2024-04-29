@@ -135,5 +135,8 @@
     "glob": "^10.3.3",
     "mocha": "^10.2.0",
     "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "esbuild": "^0.20.2"
   }
 }

@@ -55,6 +55,9 @@ export async function searchFaves(managers: FavesManager[]) {
           label: basename(fave.path),
           iconPath: manager.itemIcon(),
           description: descriptionParts.filter(s => !!s).join(" ● "),
+          buttons: [
+            new RemoveFaveButton(),
+          ]
         };
 
         items.push(item);
@@ -78,7 +81,21 @@ export async function searchFaves(managers: FavesManager[]) {
   disposables.push(
     input.onDidTriggerItemButton(event => {
       // No switch since only one button, but TODO should add switch on constructor for safety
-      event.item.manager.removePath(event.item.fave.path);
+      switch (event.button.constructor) {
+      case RemoveFaveButton:
+        event.item.manager.removePath(event.item.fave.path);
+        const index = input.items.indexOf(event.item);
+        input.items = [
+          ...input.items.slice(0, index),
+          ...input.items.slice(index+1, input.items.length),
+        ];
+        // vscode.window.showInformationMessage(`HEYO: ${}`);
+        break;
+      default:
+        vscode.window.showErrorMessage(`Unknown item button`);
+      }
+
+
     }),
     input.onDidHide(e => {
       disposables.forEach(d => d.dispose);

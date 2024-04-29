@@ -164,12 +164,19 @@ abstract class FavesManager {
     if (this.faves.has(p)) {
       vscode.window.showInformationMessage("File already exists in favorites");
     } else {
-      vscode.window.showInformationMessage("Adding file to favorites");
       this.faves.set(p, {
         path: p,
         alias,
       });
-      return await this.updateConfiguration();
+      return await this.updateConfiguration()
+        .then(() => {
+          // Make sure we don't return the message
+          vscode.window.showInformationMessage(`${basename(f.fsPath)} was added to faves.${this.subsection}`);
+        })
+        .catch((reason) => {
+          // Make sure we don't return the message
+          vscode.window.showErrorMessage(`Failed to add ${basename(f.fsPath)} to faves.${this.subsection}: ${reason}`);
+        });
     }
   }
 
@@ -181,9 +188,16 @@ abstract class FavesManager {
     if (!this.faves.has(path)) {
       vscode.window.showInformationMessage("File already removed from favorites");
     } else {
-      vscode.window.showInformationMessage("Removing file from favorites");
       this.faves.delete(path);
-      return await this.updateConfiguration();
+      return await this.updateConfiguration()
+        .then(() => {
+          // Make sure we don't return the message
+          vscode.window.showInformationMessage(`${basename(path)} was removed from faves.${this.subsection}`);
+        })
+        .catch((reason) => {
+          // Make sure we don't return the message
+          vscode.window.showErrorMessage(`Failed to remove ${basename(path)} from faves.${this.subsection}: ${reason}`);
+        });
     }
   }
 

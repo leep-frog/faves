@@ -3,7 +3,7 @@
   "displayName": "faves",
   "description": "",
   "publisher": "groogle",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "engines": {
     "vscode": "^1.81.0"
   },

@@ -3,7 +3,7 @@
   "displayName": "faves",
   "description": "",
   "publisher": "groogle",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "engines": {
     "vscode": "^1.81.0"
   },
@@ -47,10 +47,6 @@
         "command": "faves.globalToggle",
         "title": "Faves: [Global] Toggle favorite bit for file",
         "icon": "$(star-full)"
-      },
-      {
-        "command": "faves.globalSearch",
-        "title": "Faves: [Global] Search"
       }
     ],
     "menus": {

@@ -3,7 +3,7 @@ import { basename } from 'path';
 import * as vscode from 'vscode';
 import path = require('path');
 
-interface Fave {
+export interface Fave {
   path: string;
   alias?: string;
 };
@@ -88,7 +88,7 @@ export async function searchFaves(managers: FavesManager[], useAlias: boolean) {
 
   const disposables: vscode.Disposable[] = [];
   const input = vscode.window.createQuickPick<FaveItem>();
-  input.matchOnDescription = true;
+  input.matchOnDescription = !useAlias;
   input.items = items;
   input.buttons = [
     // This is for global buttons (not item specific)

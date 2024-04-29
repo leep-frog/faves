@@ -1,9 +1,16 @@
 import * as assert from 'assert';
-
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
 import * as vscode from 'vscode';
-// import * as myExtension from '../../extension';
+import { Fave } from '../../faves';
+
+// TODO: Use stubbables from groog extension
+// Stub updateConfiguration
+
+interface TestCase {
+  startingFaves: Map<string, Fave>;
+  startingGlobalFaves: Map<string, Fave>;
+  wantFaves: Map<string, Fave>;
+  wantGlobalFaves: Map<string, Fave>;
+}
 
 suite('Extension Test Suite', () => {
 	vscode.window.showInformationMessage('Start all tests.');

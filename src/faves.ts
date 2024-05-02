@@ -1,7 +1,11 @@
+import { nestedGet } from "@leep-frog/vscode-test-stubber";
 import { existsSync, lstatSync } from 'fs';
 import { basename } from 'path';
 import * as vscode from 'vscode';
 import path = require('path');
+
+// TODO: Remove this once we use stubber elsewhere
+const _ = nestedGet(new Map<string, any>(), []);
 
 export interface Fave {
   path: string;
@@ -223,11 +227,10 @@ abstract class FavesManager {
     this.faves = new Map(keyValueList);
   }
 
-  private updateConfiguration(): Promise<void> {
-    vscode.workspace.getConfiguration("faves").update(this.subsection, this.orderedFaves(), this.configurationTarget, true).then(undefined, (reason: any) => {
+  private async updateConfiguration(): Promise<void> {
+    return vscode.workspace.getConfiguration("faves").update(this.subsection, this.orderedFaves(), this.configurationTarget, true).then(undefined, (reason: any) => {
       vscode.window.showInformationMessage(`Failed to update favorites: ${reason}`);
     });
-    return Promise.resolve();
   }
 }
 

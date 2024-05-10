@@ -39,13 +39,13 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(vscode.commands.registerCommand('faves.remove', uriExecutor((u: vscode.Uri) => (workspaceFaves.remove(u)))));
   context.subscriptions.push(vscode.commands.registerCommand('faves.toggle', uriExecutor((u: vscode.Uri) => (workspaceFaves.toggle(u)))));
 
-  context.subscriptions.push(vscode.commands.registerCommand('faves.search', (ss: SearchSettings | undefined) => searchFaves([
-    workspaceFaves, globalFaves,
-  ], !!ss?.alias)));
-
   context.subscriptions.push(vscode.commands.registerCommand('faves.globalAdd', uriExecutor((u: vscode.Uri) => (globalFaves.add(u)))));
   context.subscriptions.push(vscode.commands.registerCommand('faves.globalRemove', uriExecutor((u: vscode.Uri) => (globalFaves.remove(u)))));
   context.subscriptions.push(vscode.commands.registerCommand('faves.globalToggle', uriExecutor((u: vscode.Uri) => (globalFaves.toggle(u)))));
+
+  context.subscriptions.push(vscode.commands.registerCommand('faves.search', (ss: SearchSettings | undefined) => searchFaves([
+    workspaceFaves, globalFaves,
+  ], !!ss?.alias)));
 
   vscode.workspace.onDidChangeConfiguration(e => {
     if (e.affectsConfiguration("faves")) {

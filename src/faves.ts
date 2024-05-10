@@ -1,11 +1,8 @@
-import { nestedGet } from "@leep-frog/vscode-test-stubber";
+import { VSCODE_STUBS } from '@leep-frog/vscode-test-stubber';
 import { existsSync, lstatSync } from 'fs';
 import { basename } from 'path';
 import * as vscode from 'vscode';
 import path = require('path');
-
-// TODO: Remove this once we use stubber elsewhere
-const _ = nestedGet(new Map<string, any>(), []);
 
 export interface Fave {
   path: string;
@@ -218,7 +215,7 @@ abstract class FavesManager {
   }
 
   reload(): void {
-    const config = vscode.workspace.getConfiguration("faves", vscode.window.activeTextEditor?.document.uri);
+    const config = VSCODE_STUBS.getConfiguration("faves");
     const favorites = config.get<Fave[]>(this.subsection);
     // We need to type-define this keyValueList (vs inline in `new Map(...)`) because typescript does some
     // weird type assumptions which results in an empty map initialization otherwise.
@@ -228,7 +225,7 @@ abstract class FavesManager {
   }
 
   private async updateConfiguration(): Promise<void> {
-    return vscode.workspace.getConfiguration("faves").update(this.subsection, this.orderedFaves(), this.configurationTarget, true).then(undefined, (reason: any) => {
+    return VSCODE_STUBS.getConfiguration("faves").update(this.subsection, this.orderedFaves(), this.configurationTarget, true).then(undefined, (reason: any) => {
       vscode.window.showInformationMessage(`Failed to update favorites: ${reason}`);
     });
   }

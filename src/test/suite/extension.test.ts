@@ -1,22 +1,32 @@
-import * as assert from 'assert';
+import { SimpleTestCase, SimpleTestCaseProps, StubbablesConfig } from '@leep-frog/vscode-test-stubber';
 import * as vscode from 'vscode';
-import { Fave } from '../../faves';
+import path = require('path');
 
-// TODO: Use stubbables from groog extension
-// Stub updateConfiguration
+// Note: this needs to be identical to the value in .vscode-test.mjs (trying to have shared import there is awkward).
+export const stubbableTestFile = path.resolve("..", "..", ".vscode-test", "stubbable-file.json");
 
 interface TestCase {
-  startingFaves: Map<string, Fave>;
-  startingGlobalFaves: Map<string, Fave>;
-  wantFaves: Map<string, Fave>;
-  wantGlobalFaves: Map<string, Fave>;
+  name: string;
+  sc: StubbablesConfig;
+  stc: SimpleTestCaseProps;
 }
 
-suite('Extension Test Suite', () => {
-	vscode.window.showInformationMessage('Start all tests.');
+const testCases: TestCase[] = [
+  {
+    name: "Does absolutely nothing",
+    sc: {},
+    stc: {},
+  },
+];
 
-	test('Sample test', () => {
-		assert.strictEqual(-1, [1, 2, 3].indexOf(5));
-		assert.strictEqual(-1, [1, 2, 3].indexOf(0));
-	});
+suite('Extension Test Suite', () => {
+  vscode.window.showInformationMessage('Start all tests.');
+
+    testCases.forEach(tc => {
+      test(tc.name, async () => {
+        await new SimpleTestCase(tc.stc).runTest(stubbableTestFile, tc.sc).catch(e => {
+          throw e;
+        });
+      });
+  });
 });

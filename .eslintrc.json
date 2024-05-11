@@ -1,24 +1,52 @@
 {
-    "root": true,
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "ecmaVersion": 6,
-        "sourceType": "module"
-    },
-    "plugins": [
-        "@typescript-eslint"
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
+  },
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "rules": {
+    "comma-dangle": "off",
+    "@typescript-eslint/comma-dangle": [
+      "error",
+      {
+        "arrays": "always-multiline",
+        "objects": "always-multiline",
+        "imports": "always-multiline",
+        "exports": "always-multiline",
+        "functions": "always-multiline",
+        "enums": "always-multiline"
+      }
     ],
-    "rules": {
-        "@typescript-eslint/naming-convention": "warn",
-        "@typescript-eslint/semi": "warn",
-        "curly": "warn",
-        "eqeqeq": "warn",
-        "no-throw-literal": "warn",
-        "semi": "off"
-    },
-    "ignorePatterns": [
-        "out",
-        "dist",
-        "**/*.d.ts"
-    ]
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": "enumMember",
+        "format": [
+          "PascalCase"
+        ]
+      }
+    ],
+    "quote-props": [
+      "error",
+      "as-needed"
+    ],
+    "@typescript-eslint/semi": "warn",
+    "curly": "warn",
+    "eqeqeq": "warn",
+    "no-throw-literal": "warn",
+    "indent": [
+      "error",
+      2
+    ],
+    "semi": "off"
+  },
+  "ignorePatterns": [
+    "out",
+    "dist",
+    "**/*.d.ts"
+  ]
 }

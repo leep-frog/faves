@@ -1,23 +1,22 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
+import { TEST_MODE } from '@leep-frog/vscode-test-stubber';
 import * as vscode from 'vscode';
 import { GlobalFavesManager, WorkspaceFavesManager, searchFaves } from './faves';
 
 const workspaceFaves = new WorkspaceFavesManager();
 const globalFaves = new GlobalFavesManager();
 
-function uriExecutor(handler: (u: vscode.Uri) => void): (u: vscode.Uri | undefined) => void {
-  return (u: vscode.Uri | undefined) => {
-    executeOnUri(handler, u);
+function uriExecutor(handler: (u: vscode.Uri) => void): () => void {
+  return () => {
+    executeOnUri(handler);
   };
 }
 
-function executeOnUri(handler: (u: vscode.Uri) => void, uri?: vscode.Uri): void {
+function executeOnUri(handler: (u: vscode.Uri) => void): void {
+  const uri = vscode.window.activeTextEditor?.document.uri;
   if (!uri) {
-    uri = vscode.window.activeTextEditor?.document.uri;
-  }
-  if (!uri) {
-    vscode.window.showErrorMessage("Unable to get file URI");
+    vscode.window.showErrorMessage("No active text editor");
     return;
   }
   if (uri.scheme !== "file") {
@@ -35,7 +34,7 @@ interface SearchSettings {
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-	context.subscriptions.push(vscode.commands.registerCommand('faves.add', uriExecutor((u: vscode.Uri) => (workspaceFaves.add(u)))));
+  context.subscriptions.push(vscode.commands.registerCommand('faves.add', uriExecutor((u: vscode.Uri) => (workspaceFaves.add(u)))));
   context.subscriptions.push(vscode.commands.registerCommand('faves.remove', uriExecutor((u: vscode.Uri) => (workspaceFaves.remove(u)))));
   context.subscriptions.push(vscode.commands.registerCommand('faves.toggle', uriExecutor((u: vscode.Uri) => (workspaceFaves.toggle(u)))));
 
@@ -53,6 +52,16 @@ export function activate(context: vscode.ExtensionContext) {
       globalFaves.reload();
     }
   });
+
+  // Test command
+  context.subscriptions.push(vscode.commands.registerCommand('faves.testReset', () => {
+    if (TEST_MODE) {
+      workspaceFaves.reload();
+      globalFaves.reload();
+    } else {
+      vscode.window.showErrorMessage(`Cannot run testReset outside of test mode!`);
+    }
+  }));
 }
 
 // This method is called when your extension is deactivated

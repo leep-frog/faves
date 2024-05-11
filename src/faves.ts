@@ -1,5 +1,5 @@
 import { VSCODE_STUBS } from '@leep-frog/vscode-test-stubber';
-import { existsSync, lstatSync } from 'fs';
+import { existsSync, lstatSync, statSync } from 'fs';
 import { basename } from 'path';
 import * as vscode from 'vscode';
 import path = require('path');
@@ -18,7 +18,7 @@ class RemoveFaveButton implements vscode.QuickInputButton {
   }
 }
 
-interface FaveItem extends vscode.QuickPickItem {
+export interface FaveItem extends vscode.QuickPickItem {
   fave: Fave;
   uri: vscode.Uri;
   manager: FavesManager;
@@ -31,10 +31,20 @@ export async function searchFaves(managers: FavesManager[], useAlias: boolean) {
     [...manager.orderedFaves()].forEach(fave => {
       manager.faveToURIs(fave).forEach(uri => {
 
+        if (!existsSync(uri.fsPath)) {
+          return;
+        }
+
+        const stat = statSync(uri.fsPath);
+        if (!stat.isFile()) {
+          return;
+        }
+
         const wsFolder = vscode.workspace.getWorkspaceFolder(uri);
+
         const descriptionParts = [];
         if (!wsFolder) {
-          // Add full path if we don't have additional in.fo
+          // Add full path if we don't have additional info
           descriptionParts.push(path.dirname(fave.path));
         } else {
           // Add the workspace identifier if there is more than one workspace folder.
@@ -62,7 +72,7 @@ export async function searchFaves(managers: FavesManager[], useAlias: boolean) {
               description: descriptionParts.filter(s => !!s).join(" ● "),
               buttons: [
                 new RemoveFaveButton(),
-              ]
+              ],
             });
           }
         } else {
@@ -75,7 +85,7 @@ export async function searchFaves(managers: FavesManager[], useAlias: boolean) {
             description: descriptionParts.filter(s => !!s).join(" ● "),
             buttons: [
               new RemoveFaveButton(),
-            ]
+            ],
           });
         }
       });
@@ -90,55 +100,57 @@ export async function searchFaves(managers: FavesManager[], useAlias: boolean) {
   const disposables: vscode.Disposable[] = [];
   const input = vscode.window.createQuickPick<FaveItem>();
   input.matchOnDescription = !useAlias;
-  input.items = items;
+  input.items = items.sort((a, b) => a.label < b.label ? -1 : 1);
   input.buttons = [
     // This is for global buttons (not item specific)
   ];
   input.placeholder = "Search favorited files";
   disposables.push(
-    input.onDidTriggerItemButton(event => {
-      // No switch since only one button, but TODO should add switch on constructor for safety
+
+    // Handle the item-level buttons
+    input.onDidTriggerItemButton(async event => {
       switch (event.button.constructor) {
       case RemoveFaveButton:
-        event.item.manager.removePath(event.item.fave.path);
+        await event.item.manager.removePath(event.item.fave.path);
         const index = input.items.indexOf(event.item);
         input.items = [
           ...input.items.slice(0, index),
           ...input.items.slice(index+1, input.items.length),
         ];
-        // vscode.window.showInformationMessage(`HEYO: ${}`);
         break;
       default:
         vscode.window.showErrorMessage(`Unknown item button`);
       }
-
-
     }),
-    input.onDidHide(e => {
-      disposables.forEach(d => d.dispose);
-    }),
-    input.onDidAccept(e => {
+
+    // Open a file if an item is selected
+    input.onDidAccept(async e => {
+      input.dispose();
       switch (input.selectedItems.length) {
       case 0:
         vscode.window.showInformationMessage("No selection made");
         break;
       case 1:
         const selectedItem = input.selectedItems.at(0)!;
-        vscode.window.showTextDocument(selectedItem.uri);
+        await vscode.window.showTextDocument(selectedItem.uri);
         break;
       default:
-        vscode.window.showInformationMessage("Multiple selections made?!?!?");
+        vscode.window.showErrorMessage("Multiple selections made?!?!?");
         break;
       }
-      input.dispose();
+    }),
+
+    // Close on input hide
+    input.onDidHide(async e => {
+      disposables.forEach(d => d.dispose);
     }),
   );
-  input.show();
+  await VSCODE_STUBS.showQuickPick(input);
 }
 
 abstract class FavesManager {
 
-  abstract uriToPath(uri: vscode.Uri): string;
+  abstract uriToPath(uri: vscode.Uri): string | undefined;
   abstract faveToURIs(fave: Fave): vscode.Uri[];
   abstract itemIcon(): vscode.ThemeIcon;
 
@@ -156,38 +168,53 @@ abstract class FavesManager {
     this.reload();
   }
 
+  public toJSON() {
+    return this.subsection;
+  }
+
   async add(f: vscode.Uri): Promise<void> {
+    const p: string | undefined = this.uriToPath(f);
+    if (!p) {
+      return;
+    }
+
+    if (this.faves.has(p)) {
+      vscode.window.showInformationMessage(`File already exists in ${this.subsection}`);
+      return;
+    }
+
     const alias = await vscode.window.showInputBox({
       placeHolder: "alias (leave blank for no alias)",
       prompt: "Fave alias",
     });
-    const p: string = this.uriToPath(f);
-    if (this.faves.has(p)) {
-      vscode.window.showInformationMessage("File already exists in favorites");
-    } else {
-      this.faves.set(p, {
-        path: p,
-        alias,
+
+    this.faves.set(p, {
+      path: p,
+      // Remove whitespace and keep as undefined if empty after trimming.
+      alias: alias?.trim() || undefined,
+    });
+    return await this.updateConfiguration()
+      .then(() => {
+        // Make sure we don't return the message
+        vscode.window.showInformationMessage(`${basename(f.fsPath)} was added to faves.${this.subsection}`);
+      })
+      .catch((reason) => {
+        // Make sure we don't return the message
+        vscode.window.showErrorMessage(`Failed to add ${basename(f.fsPath)} to faves.${this.subsection}: ${reason}`);
       });
-      return await this.updateConfiguration()
-        .then(() => {
-          // Make sure we don't return the message
-          vscode.window.showInformationMessage(`${basename(f.fsPath)} was added to faves.${this.subsection}`);
-        })
-        .catch((reason) => {
-          // Make sure we don't return the message
-          vscode.window.showErrorMessage(`Failed to add ${basename(f.fsPath)} to faves.${this.subsection}: ${reason}`);
-        });
-    }
   }
 
   async remove(f: vscode.Uri): Promise<void> {
-    return this.removePath(this.uriToPath(f));
+    const p = this.uriToPath(f);
+    if (!p) {
+      return;
+    }
+    return this.removePath(p);
   }
 
   async removePath(path: string): Promise<void> {
     if (!this.faves.has(path)) {
-      vscode.window.showInformationMessage("File already removed from favorites");
+      vscode.window.showInformationMessage(`File does not exist in faves.${this.subsection}`);
     } else {
       this.faves.delete(path);
       return await this.updateConfiguration()
@@ -203,7 +230,12 @@ abstract class FavesManager {
   }
 
   toggle(f: vscode.Uri) {
-    if (this.faves.has(this.uriToPath(f))) {
+    const p = this.uriToPath(f);
+    if (!p) {
+      return;
+    }
+
+    if (this.faves.has(p)) {
       this.remove(f);
     } else {
       this.add(f);
@@ -225,7 +257,9 @@ abstract class FavesManager {
   }
 
   private async updateConfiguration(): Promise<void> {
-    return VSCODE_STUBS.getConfiguration("faves").update(this.subsection, this.orderedFaves(), this.configurationTarget, true).then(undefined, (reason: any) => {
+    // TODO: Update vscode-test-stubber (or this logic?) so 'faves' can be passed in `getConfiguration'. The issue is that
+    // getConfiguration gets the highest-level config that matches faves (so the workspace one, even though the globalFavorites setting isn't present there).
+    return VSCODE_STUBS.getConfiguration("faves").update(this.subsection, this.orderedFaves(), this.configurationTarget).then(undefined, (reason: any) => {
       vscode.window.showInformationMessage(`Failed to update favorites: ${reason}`);
     });
   }
@@ -260,10 +294,11 @@ export class GlobalFavesManager extends FavesManager {
     return new vscode.ThemeIcon("globe");
   }
 
-  uriToPath(uri: vscode.Uri): string {
+  uriToPath(uri: vscode.Uri): string | undefined {
     const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
     if (!workspaceFolder) {
-      throw new Error("No workspace folder for given URI!");
+      vscode.window.showErrorMessage(`File is not in a workspace folder`);
+      return;
     }
     return path.relative(workspaceFolder.uri.fsPath, uri.fsPath);
   }

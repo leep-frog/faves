@@ -47,6 +47,10 @@
         "command": "faves.globalToggle",
         "title": "Faves: [Global] Toggle favorite bit for file",
         "icon": "$(star-full)"
+      },
+      {
+        "command": "faves.testReset",
+        "title": "Faves: Reset test setup"
       }
     ],
     "menus": {

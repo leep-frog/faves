@@ -247,7 +247,7 @@ abstract class FavesManager {
   }
 
   reload(): void {
-    const config = VSCODE_STUBS.getConfiguration();
+    const config = vscode.workspace.getConfiguration();
     const favorites = config.get<Fave[]>(`faves.${this.subsection}`);
     // We need to type-define this keyValueList (vs inline in `new Map(...)`) because typescript does some
     // weird type assumptions which results in an empty map initialization otherwise.
@@ -259,7 +259,7 @@ abstract class FavesManager {
   private async updateConfiguration(): Promise<void> {
     // TODO: Update vscode-test-stubber (or this logic?) so 'faves' can be passed in `getConfiguration'. The issue is that
     // getConfiguration gets the highest-level config that matches faves (so the workspace one, even though the globalFavorites setting isn't present there).
-    return VSCODE_STUBS.getConfiguration().update(`faves.${this.subsection}`, this.orderedFaves(), this.configurationTarget).then(undefined, (reason: any) => {
+    return vscode.workspace.getConfiguration().update(`faves.${this.subsection}`, this.orderedFaves(), this.configurationTarget).then(undefined, (reason: any) => {
       vscode.window.showInformationMessage(`Failed to update favorites: ${reason}`);
     });
   }

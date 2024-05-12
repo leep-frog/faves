@@ -1,4 +1,4 @@
-import { PressUnknownButtonQuickPickAction, SelectItemQuickPickAction, SimpleTestCase, SimpleTestCaseProps, StubbablesConfig, UserInteraction, cmd, delay } from '@leep-frog/vscode-test-stubber';
+import { PressItemButtonQuickPickAction, PressUnknownButtonQuickPickAction, SelectItemQuickPickAction, SimpleTestCase, SimpleTestCaseProps, StubbablesConfig, UserInteraction, cmd, delay } from '@leep-frog/vscode-test-stubber';
 import * as vscode from 'vscode';
 import path = require('path');
 
@@ -1752,9 +1752,8 @@ const testCases: TestCase[] = [
       },
     },
   },
-  /*{
+  {
     name: "Handles remove fave button for global",
-    runSolo: true,
     stc: {
       userInteractions: [
         cmd('faves.search', {alias: true}),
@@ -1818,7 +1817,7 @@ const testCases: TestCase[] = [
       ]]),
       workspaceConfiguration: {
         configuration: new Map<vscode.ConfigurationTarget, Map<string, any>>([
-          [vscode.ConfigurationTarget.Global, new Map<string, any>([
+          [vscode.ConfigurationTarget.Workspace, new Map<string, any>([
           // TODO: [vscode.ConfigurationTarget.Workspace, new Map<string, any>([
             ['faves', new Map<string, any>([
               ['favorites', [
@@ -1837,10 +1836,10 @@ const testCases: TestCase[] = [
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'dne.txt'),
                 },
               ]],
-              //   ])],
-              // ])],
-              // [vscode.ConfigurationTarget.Global, new Map<string, any>([
-              //   ['faves', new Map<string, any>([
+            ])],
+          ])],
+          [vscode.ConfigurationTarget.Global, new Map<string, any>([
+            ['faves', new Map<string, any>([
               ['globalFavorites', [
                 {
                   path: path.join('nested', 'tree.txt'),
@@ -1860,7 +1859,7 @@ const testCases: TestCase[] = [
       },
       expectedWorkspaceConfiguration: {
         configuration: new Map<vscode.ConfigurationTarget, Map<string, any>>([
-          [vscode.ConfigurationTarget.Global, new Map<string, any>([
+          [vscode.ConfigurationTarget.Workspace, new Map<string, any>([
           // TODO: [vscode.ConfigurationTarget.Workspace, new Map<string, any>([
             ['faves', new Map<string, any>([
               ['favorites', [
@@ -1879,15 +1878,11 @@ const testCases: TestCase[] = [
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'dne.txt'),
                 },
               ]],
-              //   ])],
-              // ])],
-              // [vscode.ConfigurationTarget.Global, new Map<string, any>([
-              //   ['faves', new Map<string, any>([
+            ])],
+          ])],
+          [vscode.ConfigurationTarget.Global, new Map<string, any>([
+            ['faves', new Map<string, any>([
               ['globalFavorites', [
-                // {
-                //   path: path.join('nested', 'tree.txt'),
-                //   alias: 'oak',
-                // },
                 {
                   path: path.join('another.txt'),
                 },
@@ -1902,9 +1897,8 @@ const testCases: TestCase[] = [
       },
     },
   },
-  /*{
+  {
     name: "Handles remove fave button for workspace",
-    runSolo: true,
     stc: {
       userInteractions: [
         cmd('faves.search', {alias: true}),
@@ -1915,7 +1909,7 @@ const testCases: TestCase[] = [
         new PressItemButtonQuickPickAction('othr', 0),
       ],
       expectedInfoMessages: [
-        'other.py was removed from faves.globalFavorites',
+        'other.py was removed from faves.favorites',
       ],
       expectedQuickPickExecutions: qpe([[
         // [globalFavorites] another.txt (no alias)
@@ -2017,11 +2011,10 @@ const testCases: TestCase[] = [
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
                 },
                 {
-                  path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts'),
-                },
-                // Ignore file that doesn't exist
-                {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'dne.txt'),
+                },
+                {
+                  path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts'),
                 },
               ]],
             ])],
@@ -2046,7 +2039,7 @@ const testCases: TestCase[] = [
         ]),
       },
     },
-  },*/
+  },
   /* Useful for commenting out tests. */
 ];
 

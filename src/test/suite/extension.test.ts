@@ -1145,6 +1145,10 @@ const testCases: TestCase[] = [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'dne.txt'),
                 },
+                // Ignore directory
+                {
+                  path: pathResolve('..', '..', 'src', 'test'),
+                },
               ]],
             ])],
           ])],
@@ -1161,6 +1165,10 @@ const testCases: TestCase[] = [
                 // Ignore file that doesn't exist
                 {
                   path: path.join('other-folder', 'idk.py'),
+                },
+                // Ignore directory
+                {
+                  path: path.join('nested'),
                 },
               ]],
             ])],

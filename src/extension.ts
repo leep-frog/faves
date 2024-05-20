@@ -1,6 +1,5 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { TEST_MODE } from '@leep-frog/vscode-test-stubber';
 import * as vscode from 'vscode';
 import { GlobalFavesManager, WorkspaceFavesManager, searchFaves } from './faves';
 
@@ -55,7 +54,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Test command
   context.subscriptions.push(vscode.commands.registerCommand('faves.testReset', () => {
-    if (TEST_MODE) {
+    if (process.env.TEST_MODE) {
       workspaceFaves.reload();
       globalFaves.reload();
     } else {

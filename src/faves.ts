@@ -1,4 +1,3 @@
-import { VSCODE_STUBS } from '@leep-frog/vscode-test-stubber';
 import { existsSync, lstatSync, statSync } from 'fs';
 import { basename } from 'path';
 import * as vscode from 'vscode';
@@ -20,7 +19,9 @@ class RemoveFaveButton implements vscode.QuickInputButton {
 
 export interface FaveItem extends vscode.QuickPickItem {
   fave: Fave;
-  uri: vscode.Uri;
+  // Comparing Uri in assertions led to awkward comparison failures due to internal workings of
+  // the vscode.Uri type (seems like memoization problem). To avoid this, we simply use the fsPath instead.
+  fsPath: string;
   manager: FavesManager;
 }
 
@@ -65,7 +66,7 @@ export async function searchFaves(managers: FavesManager[], useAlias: boolean) {
             descriptionParts.push(basename(fave.path));
             items.push({
               fave,
-              uri,
+              fsPath: uri.fsPath,
               manager,
               label: fave.alias,
               iconPath: manager.itemIcon(),
@@ -78,7 +79,7 @@ export async function searchFaves(managers: FavesManager[], useAlias: boolean) {
         } else {
           items.push({
             fave,
-            uri,
+            fsPath: uri.fsPath,
             manager,
             label: basename(fave.path),
             iconPath: manager.itemIcon(),
@@ -132,7 +133,7 @@ export async function searchFaves(managers: FavesManager[], useAlias: boolean) {
         break;
       case 1:
         const selectedItem = input.selectedItems.at(0)!;
-        await vscode.window.showTextDocument(selectedItem.uri);
+        await vscode.window.showTextDocument(vscode.Uri.file(selectedItem.fsPath));
         break;
       default:
         vscode.window.showErrorMessage("Multiple selections made?!?!?");
@@ -145,7 +146,7 @@ export async function searchFaves(managers: FavesManager[], useAlias: boolean) {
       disposables.forEach(d => d.dispose);
     }),
   );
-  await VSCODE_STUBS.showQuickPick(input);
+  input.show();
 }
 
 abstract class FavesManager {

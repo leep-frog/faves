@@ -1,9 +1,6 @@
-import { PressItemButtonQuickPickAction, PressUnknownButtonQuickPickAction, SelectItemQuickPickAction, SimpleTestCase, SimpleTestCaseProps, StubbablesConfig, UserInteraction, cmd, delay } from '@leep-frog/vscode-test-stubber';
+import { PressItemButtonQuickPickAction, PressUnknownButtonQuickPickAction, SelectItemQuickPickAction, SimpleTestCase, SimpleTestCaseProps, UserInteraction, cmd, delay } from '@leep-frog/vscode-test-stubber';
 import * as vscode from 'vscode';
 import path = require('path');
-
-// Note: this needs to be identical to the value in .vscode-test.mjs (trying to have shared import there is awkward).
-export const stubbableTestFile = path.resolve("..", "..", ".vscode-test", "stubbable-file.json");
 
 function startingFile(filename: string) {
   return path.resolve(__dirname, "..", "..", "..", "src", "test", "test-workspace", filename);
@@ -13,16 +10,15 @@ function pathResolve(...filepath: string[]) {
   return vscode.Uri.file(path.resolve(...filepath)).fsPath;
 }
 
-function uriFile(...filepath: string[]) {
-  const uri = vscode.Uri.file(path.join(...filepath));
-  uri.fsPath;
-  return uri;
+function uriFile(...filepath: string[]): string {
+  // Comparing Uri in assertions led to awkward comparison failures due to internal workings of
+  // the vscode.Uri type (seems like memoization problem). To avoid this, we simply pass the fsPath instead.
+  return vscode.Uri.file(path.join(...filepath)).fsPath;
 }
 
 interface TestCase {
   name: string;
   stc: SimpleTestCaseProps;
-  sc?: StubbablesConfig;
   runSolo?: boolean;
 }
 
@@ -57,14 +53,12 @@ const testCases: TestCase[] = [
   // Add tests
   {
     name: "Fails to add if no active editor",
-    sc: {
-      expectedErrorMessages: [
-        'No active text editor',
-      ],
-    },
     stc: {
       userInteractions: [
         cmd('faves.add'),
+      ],
+      expectedErrorMessages: [
+        'No active text editor',
       ],
     },
   },
@@ -78,8 +72,6 @@ const testCases: TestCase[] = [
         waitForOutputScheme,
         cmd('faves.add'),
       ],
-    },
-    sc: {
       expectedErrorMessages: [
         "Currently, only file resources are supported",
       ],
@@ -94,8 +86,6 @@ const testCases: TestCase[] = [
         waitForFileScheme,
         cmd('faves.add'),
       ],
-    },
-    sc: {
       expectedInfoMessages: [
         'File already exists in favorites',
       ],
@@ -124,8 +114,6 @@ const testCases: TestCase[] = [
       userInteractions: [
         cmd('faves.add'),
       ],
-    },
-    sc: {
       expectedInfoMessages: [
         'bloop.java was added to faves.favorites',
       ],
@@ -162,8 +150,6 @@ const testCases: TestCase[] = [
       userInteractions: [
         cmd('faves.add'),
       ],
-    },
-    sc: {
       expectedInfoMessages: [
         'bloop.java was added to faves.favorites',
       ],
@@ -200,8 +186,6 @@ const testCases: TestCase[] = [
       userInteractions: [
         cmd('faves.add'),
       ],
-    },
-    sc: {
       expectedInfoMessages: [
         'bloop.java was added to faves.favorites',
       ],
@@ -238,8 +222,6 @@ const testCases: TestCase[] = [
       userInteractions: [
         cmd('faves.add'),
       ],
-    },
-    sc: {
       expectedInfoMessages: [
         'bloop.java was added to faves.favorites',
       ],
@@ -277,8 +259,6 @@ const testCases: TestCase[] = [
       userInteractions: [
         cmd('faves.add'),
       ],
-    },
-    sc: {
       expectedInfoMessages: [
         'bloop.java was added to faves.favorites',
       ],
@@ -334,14 +314,12 @@ const testCases: TestCase[] = [
   // [Global] Add tests
   {
     name: "[Global] Fails to add if no active editor",
-    sc: {
-      expectedErrorMessages: [
-        'No active text editor',
-      ],
-    },
     stc: {
       userInteractions: [
         cmd('faves.globalAdd'),
+      ],
+      expectedErrorMessages: [
+        'No active text editor',
       ],
     },
   },
@@ -355,8 +333,6 @@ const testCases: TestCase[] = [
         waitForOutputScheme,
         cmd('faves.globalAdd'),
       ],
-    },
-    sc: {
       expectedErrorMessages: [
         "Currently, only file resources are supported",
       ],
@@ -371,8 +347,6 @@ const testCases: TestCase[] = [
         waitForFileScheme,
         cmd('faves.globalAdd'),
       ],
-    },
-    sc: {
       expectedInfoMessages: [
         'File already exists in globalFavorites',
       ],
@@ -401,8 +375,6 @@ const testCases: TestCase[] = [
       userInteractions: [
         cmd('faves.globalAdd'),
       ],
-    },
-    sc: {
       expectedErrorMessages: [
         'File is not in a workspace folder',
       ],
@@ -416,8 +388,6 @@ const testCases: TestCase[] = [
       userInteractions: [
         cmd('faves.globalAdd'),
       ],
-    },
-    sc: {
       expectedInfoMessages: [
         'bloop.java was added to faves.globalFavorites',
       ],
@@ -454,8 +424,6 @@ const testCases: TestCase[] = [
       userInteractions: [
         cmd('faves.globalAdd'),
       ],
-    },
-    sc: {
       expectedInfoMessages: [
         'bloop.java was added to faves.globalFavorites',
       ],
@@ -493,8 +461,6 @@ const testCases: TestCase[] = [
       userInteractions: [
         cmd('faves.globalAdd'),
       ],
-    },
-    sc: {
       expectedInfoMessages: [
         `leaf.ts was added to faves.globalFavorites`,
       ],
@@ -532,8 +498,6 @@ const testCases: TestCase[] = [
       userInteractions: [
         cmd('faves.globalAdd'),
       ],
-    },
-    sc: {
       expectedInfoMessages: [
         'bloop.java was added to faves.globalFavorites',
       ],
@@ -589,14 +553,12 @@ const testCases: TestCase[] = [
   // Remove file tests
   {
     name: "Fails to remove if no active editor",
-    sc: {
-      expectedErrorMessages: [
-        'No active text editor',
-      ],
-    },
     stc: {
       userInteractions: [
         cmd('faves.remove'),
+      ],
+      expectedErrorMessages: [
+        'No active text editor',
       ],
     },
   },
@@ -610,8 +572,6 @@ const testCases: TestCase[] = [
         waitForOutputScheme,
         cmd('faves.remove'),
       ],
-    },
-    sc: {
       expectedErrorMessages: [
         "Currently, only file resources are supported",
       ],
@@ -626,8 +586,6 @@ const testCases: TestCase[] = [
         waitForFileScheme,
         cmd('faves.remove'),
       ],
-    },
-    sc: {
       expectedInfoMessages: [
         'File does not exist in faves.favorites',
       ],
@@ -641,8 +599,6 @@ const testCases: TestCase[] = [
       userInteractions: [
         cmd('faves.remove'),
       ],
-    },
-    sc: {
       expectedInfoMessages: [
         'bloop.java was removed from faves.favorites',
       ],
@@ -688,14 +644,12 @@ const testCases: TestCase[] = [
   // [Global] Remove file tests
   {
     name: "[Global] Fails to remove if no active editor",
-    sc: {
-      expectedErrorMessages: [
-        'No active text editor',
-      ],
-    },
     stc: {
       userInteractions: [
         cmd('faves.globalRemove'),
+      ],
+      expectedErrorMessages: [
+        'No active text editor',
       ],
     },
   },
@@ -709,8 +663,6 @@ const testCases: TestCase[] = [
         waitForOutputScheme,
         cmd('faves.globalRemove'),
       ],
-    },
-    sc: {
       expectedErrorMessages: [
         "Currently, only file resources are supported",
       ],
@@ -725,8 +677,6 @@ const testCases: TestCase[] = [
         waitForFileScheme,
         cmd('faves.globalRemove'),
       ],
-    },
-    sc: {
       expectedInfoMessages: [
         'File does not exist in faves.globalFavorites',
       ],
@@ -740,8 +690,6 @@ const testCases: TestCase[] = [
       userInteractions: [
         cmd('faves.globalRemove'),
       ],
-    },
-    sc: {
       expectedErrorMessages: [
         'File is not in a workspace folder',
       ],
@@ -755,8 +703,6 @@ const testCases: TestCase[] = [
       userInteractions: [
         cmd('faves.globalRemove'),
       ],
-    },
-    sc: {
       expectedInfoMessages: [
         'bloop.java was removed from faves.globalFavorites',
       ],
@@ -808,8 +754,6 @@ const testCases: TestCase[] = [
       userInteractions: [
         cmd('faves.toggle'),
       ],
-    },
-    sc: {
       expectedInfoMessages: [
         'bloop.java was added to faves.favorites',
       ],
@@ -846,8 +790,6 @@ const testCases: TestCase[] = [
       userInteractions: [
         cmd('faves.toggle'),
       ],
-    },
-    sc: {
       expectedInfoMessages: [
         'bloop.java was removed from faves.favorites',
       ],
@@ -899,8 +841,6 @@ const testCases: TestCase[] = [
       userInteractions: [
         cmd('faves.globalToggle'),
       ],
-    },
-    sc: {
       expectedErrorMessages: [
         'File is not in a workspace folder',
       ],
@@ -914,8 +854,6 @@ const testCases: TestCase[] = [
       userInteractions: [
         cmd('faves.globalToggle'),
       ],
-    },
-    sc: {
       expectedInfoMessages: [
         'bloop.java was added to faves.globalFavorites',
       ],
@@ -952,8 +890,6 @@ const testCases: TestCase[] = [
       userInteractions: [
         cmd('faves.globalToggle'),
       ],
-    },
-    sc: {
       expectedInfoMessages: [
         'tree.txt was removed from faves.globalFavorites',
       ],
@@ -996,8 +932,6 @@ const testCases: TestCase[] = [
       userInteractions: [
         cmd('faves.search'),
       ],
-    },
-    sc: {
       expectedInfoMessages: [
         'No favorites exist for this workspace',
       ],
@@ -1008,16 +942,12 @@ const testCases: TestCase[] = [
     stc: {
       userInteractions: [
         cmd('faves.search'),
-      ],
-    },
-    sc: {
-      quickPickActions: [
         new SelectItemQuickPickAction([]),
       ],
       expectedInfoMessages: [
         'No selection made',
       ],
-      expectedQuickPickExecutions: qpe([[
+      expectedQuickPicks: qpe([[
         // [globalFavorites] another.txt
         {
           buttons: [
@@ -1037,7 +967,7 @@ const testCases: TestCase[] = [
           },
           label: "another.txt",
           manager: 'globalFavorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'another.txt')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'another.txt')),
         },
         // [favorites] bloop.java
         {
@@ -1058,7 +988,7 @@ const testCases: TestCase[] = [
           },
           label: "bloop.java",
           manager: 'favorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java')),
         },
         // [favorites] leaf.ts
         {
@@ -1079,7 +1009,7 @@ const testCases: TestCase[] = [
           },
           label: "leaf.ts",
           manager: 'favorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts')),
         },
         // [favorites] other.py
         {
@@ -1101,7 +1031,7 @@ const testCases: TestCase[] = [
           },
           label: "other.py",
           manager: 'favorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py')),
         },
         // [globalFavorites] tree.txt
         {
@@ -1123,7 +1053,7 @@ const testCases: TestCase[] = [
           },
           label: "tree.txt",
           manager: 'globalFavorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'tree.txt')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'tree.txt')),
         },
       ]]),
       workspaceConfiguration: {
@@ -1182,10 +1112,6 @@ const testCases: TestCase[] = [
     stc: {
       userInteractions: [
         cmd('faves.search'),
-      ],
-    },
-    sc: {
-      quickPickActions: [
         new SelectItemQuickPickAction([
           'bloop.java',
           'tree.txt',
@@ -1194,7 +1120,7 @@ const testCases: TestCase[] = [
       expectedErrorMessages: [
         'Multiple selections made?!?!?',
       ],
-      expectedQuickPickExecutions: qpe([[
+      expectedQuickPicks: qpe([[
         // [globalFavorites] another.txt
         {
           buttons: [
@@ -1214,7 +1140,7 @@ const testCases: TestCase[] = [
           },
           label: "another.txt",
           manager: 'globalFavorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'another.txt')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'another.txt')),
         },
         // [favorites] bloop.java
         {
@@ -1235,7 +1161,7 @@ const testCases: TestCase[] = [
           },
           label: "bloop.java",
           manager: 'favorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java')),
         },
         // [favorites] leaf.ts
         {
@@ -1256,7 +1182,7 @@ const testCases: TestCase[] = [
           },
           label: "leaf.ts",
           manager: 'favorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts')),
         },
         // [favorites] other.py
         {
@@ -1278,7 +1204,7 @@ const testCases: TestCase[] = [
           },
           label: "other.py",
           manager: 'favorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py')),
         },
         // [globalFavorites] tree.txt
         {
@@ -1300,7 +1226,7 @@ const testCases: TestCase[] = [
           },
           label: "tree.txt",
           manager: 'globalFavorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'tree.txt')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'tree.txt')),
         },
       ]]),
       workspaceConfiguration: {
@@ -1356,15 +1282,11 @@ const testCases: TestCase[] = [
       ],
       userInteractions: [
         cmd('faves.search'),
-      ],
-    },
-    sc: {
-      quickPickActions: [
         new SelectItemQuickPickAction([
           'tree.txt',
         ]),
       ],
-      expectedQuickPickExecutions: qpe([[
+      expectedQuickPicks: qpe([[
         // [globalFavorites] another.txt
         {
           buttons: [
@@ -1384,7 +1306,7 @@ const testCases: TestCase[] = [
           },
           label: "another.txt",
           manager: 'globalFavorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'another.txt')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'another.txt')),
         },
         // [favorites] bloop.java
         {
@@ -1405,7 +1327,7 @@ const testCases: TestCase[] = [
           },
           label: "bloop.java",
           manager: 'favorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java')),
         },
         // [favorites] faves.ts
         {
@@ -1426,7 +1348,7 @@ const testCases: TestCase[] = [
           },
           label: "faves.ts",
           manager: 'favorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'faves.ts')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'faves.ts')),
         },
         // [favorites] leaf.ts
         {
@@ -1447,7 +1369,7 @@ const testCases: TestCase[] = [
           },
           label: "leaf.ts",
           manager: 'favorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts')),
         },
         // [favorites] other.py
         {
@@ -1469,7 +1391,7 @@ const testCases: TestCase[] = [
           },
           label: "other.py",
           manager: 'favorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py')),
         },
         // [globalFavorites] tree.txt
         {
@@ -1491,7 +1413,7 @@ const testCases: TestCase[] = [
           },
           label: "tree.txt",
           manager: 'globalFavorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'tree.txt')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'tree.txt')),
         },
       ]]),
       workspaceConfiguration: {
@@ -1555,13 +1477,9 @@ const testCases: TestCase[] = [
       ],
       userInteractions: [
         cmd('faves.search', {alias: true}),
-      ],
-    },
-    sc: {
-      quickPickActions: [
         new SelectItemQuickPickAction(['othr']),
       ],
-      expectedQuickPickExecutions: qpe([[
+      expectedQuickPicks: qpe([[
         // [globalFavorites] another.txt (no alias)
         // [favorites] bloop.java (no alias)
         // [favorites] leaf.ts (no alias)
@@ -1585,7 +1503,7 @@ const testCases: TestCase[] = [
           },
           label: "oak",
           manager: 'globalFavorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'tree.txt')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'tree.txt')),
         },
         // [favorites] other.py
         {
@@ -1607,7 +1525,7 @@ const testCases: TestCase[] = [
           },
           label: "othr",
           manager: 'favorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py')),
         },
       ]]),
       workspaceConfiguration: {
@@ -1659,16 +1577,12 @@ const testCases: TestCase[] = [
     stc: {
       userInteractions: [
         cmd('faves.search', {alias: true}),
-      ],
-    },
-    sc: {
-      quickPickActions: [
         new PressUnknownButtonQuickPickAction('othr'),
       ],
       expectedErrorMessages: [
         'Unknown item button',
       ],
-      expectedQuickPickExecutions: qpe([[
+      expectedQuickPicks: qpe([[
         // [globalFavorites] another.txt (no alias)
         // [favorites] bloop.java (no alias)
         // [favorites] leaf.ts (no alias)
@@ -1692,7 +1606,7 @@ const testCases: TestCase[] = [
           },
           label: "oak",
           manager: 'globalFavorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'tree.txt')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'tree.txt')),
         },
         // [favorites] other.py
         {
@@ -1714,7 +1628,7 @@ const testCases: TestCase[] = [
           },
           label: "othr",
           manager: 'favorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py')),
         },
       ]]),
       workspaceConfiguration: {
@@ -1765,16 +1679,12 @@ const testCases: TestCase[] = [
     stc: {
       userInteractions: [
         cmd('faves.search', {alias: true}),
-      ],
-    },
-    sc: {
-      quickPickActions: [
         new PressItemButtonQuickPickAction('oak', 0),
       ],
       expectedInfoMessages: [
         'tree.txt was removed from faves.globalFavorites',
       ],
-      expectedQuickPickExecutions: qpe([[
+      expectedQuickPicks: qpe([[
         // [globalFavorites] another.txt (no alias)
         // [favorites] bloop.java (no alias)
         // [favorites] leaf.ts (no alias)
@@ -1798,7 +1708,7 @@ const testCases: TestCase[] = [
           },
           label: "oak",
           manager: 'globalFavorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'tree.txt')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'tree.txt')),
         },
         // [favorites] other.py
         {
@@ -1820,7 +1730,7 @@ const testCases: TestCase[] = [
           },
           label: "othr",
           manager: 'favorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py')),
         },
       ]]),
       workspaceConfiguration: {
@@ -1910,16 +1820,12 @@ const testCases: TestCase[] = [
     stc: {
       userInteractions: [
         cmd('faves.search', {alias: true}),
-      ],
-    },
-    sc: {
-      quickPickActions: [
         new PressItemButtonQuickPickAction('othr', 0),
       ],
       expectedInfoMessages: [
         'other.py was removed from faves.favorites',
       ],
-      expectedQuickPickExecutions: qpe([[
+      expectedQuickPicks: qpe([[
         // [globalFavorites] another.txt (no alias)
         // [favorites] bloop.java (no alias)
         // [favorites] leaf.ts (no alias)
@@ -1943,7 +1849,7 @@ const testCases: TestCase[] = [
           },
           label: "oak",
           manager: 'globalFavorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'tree.txt')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'tree.txt')),
         },
         // [favorites] other.py
         {
@@ -1965,7 +1871,7 @@ const testCases: TestCase[] = [
           },
           label: "othr",
           manager: 'favorites',
-          uri: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py')),
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py')),
         },
       ]]),
       workspaceConfiguration: {
@@ -2071,7 +1977,7 @@ suite('Extension Test Suite', () => {
       ];
 
       // Run test
-      await new SimpleTestCase(tc.stc).runTest(stubbableTestFile, tc.sc).catch(e => {
+      await new SimpleTestCase(tc.stc).runTest().catch((e: any) => {
         throw e;
       });
     });

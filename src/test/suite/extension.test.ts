@@ -1476,7 +1476,7 @@ const testCases: TestCase[] = [
         '',
       ],
       userInteractions: [
-        cmd('faves.search', {alias: true}),
+        cmd('faves.aliasSearch'),
         new SelectItemQuickPickAction(['othr']),
       ],
       expectedQuickPicks: qpe([[
@@ -1576,7 +1576,7 @@ const testCases: TestCase[] = [
     name: "Handles unknown button",
     stc: {
       userInteractions: [
-        cmd('faves.search', {alias: true}),
+        cmd('faves.aliasSearch'),
         new PressUnknownButtonQuickPickAction('othr'),
       ],
       expectedErrorMessages: [
@@ -1678,7 +1678,7 @@ const testCases: TestCase[] = [
     name: "Handles remove fave button for global",
     stc: {
       userInteractions: [
-        cmd('faves.search', {alias: true}),
+        cmd('faves.aliasSearch'),
         new PressItemButtonQuickPickAction('oak', 0),
       ],
       expectedInfoMessages: [
@@ -1819,7 +1819,7 @@ const testCases: TestCase[] = [
     name: "Handles remove fave button for workspace",
     stc: {
       userInteractions: [
-        cmd('faves.search', {alias: true}),
+        cmd('faves.aliasSearch'),
         new PressItemButtonQuickPickAction('othr', 0),
       ],
       expectedInfoMessages: [

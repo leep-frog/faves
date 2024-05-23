@@ -25,10 +25,6 @@ function executeOnUri(handler: (u: vscode.Uri) => void): void {
   handler(uri);
 }
 
-interface SearchSettings {
-  alias?: boolean;
-}
-
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -41,9 +37,13 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(vscode.commands.registerCommand('faves.globalRemove', uriExecutor((u: vscode.Uri) => (globalFaves.remove(u)))));
   context.subscriptions.push(vscode.commands.registerCommand('faves.globalToggle', uriExecutor((u: vscode.Uri) => (globalFaves.toggle(u)))));
 
-  context.subscriptions.push(vscode.commands.registerCommand('faves.search', (ss: SearchSettings | undefined) => searchFaves([
+  context.subscriptions.push(vscode.commands.registerCommand('faves.search', () => searchFaves([
     workspaceFaves, globalFaves,
-  ], !!ss?.alias)));
+  ], false)));
+
+  context.subscriptions.push(vscode.commands.registerCommand('faves.aliasSearch', () => searchFaves([
+    workspaceFaves, globalFaves,
+  ], true)));
 
   vscode.workspace.onDidChangeConfiguration(e => {
     if (e.affectsConfiguration("faves")) {

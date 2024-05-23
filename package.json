@@ -3,7 +3,7 @@
   "displayName": "faves",
   "description": "",
   "publisher": "groogle",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "dependencies": {
     "@leep-frog/vscode-test-stubber": "^1.11.1",
     "esbuild": "^0.20.2"
@@ -38,6 +38,10 @@
       {
         "command": "faves.search",
         "title": "Faves: Search"
+      },
+      {
+        "command": "faves.aliasSearch",
+        "title": "Faves: Search Aliases"
       },
       {
         "command": "faves.globalAdd",

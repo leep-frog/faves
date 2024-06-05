@@ -5,7 +5,7 @@
   "publisher": "groogle",
   "version": "1.0.2",
   "dependencies": {
-    "@leep-frog/vscode-test-stubber": "^1.11.4",
+    "@leep-frog/vscode-test-stubber": "^1.11.5",
     "esbuild": "^0.20.2"
   },
   "engines": {

@@ -26,25 +26,13 @@ function qpe<T extends vscode.QuickPickItem>(items: (T | string)[][]): (vscode.Q
   return items;
 }
 
-// WaitForScheme is a UserInteraction that waits for the active text editor to have the provided scheme
-class WaitForScheme extends Waiter {
-
-  readonly scheme: 'output' | 'file';
-
-  delayIntervalMs: number = 5;
-
-  constructor(scheme: 'output' | 'file') {
-    super();
-    this.scheme = scheme;
-  }
-
-  done(): boolean {
-    return vscode.window.activeTextEditor?.document.uri.scheme === this.scheme;
-  }
+// waitForScheme is a UserInteraction that waits for the active text editor to have the provided scheme
+function waitForScheme(scheme: 'output' | 'file'): Waiter {
+  return new Waiter(5, () => vscode.window.activeTextEditor?.document.uri.scheme === scheme);
 }
 
-const waitForOutputScheme = new WaitForScheme('output');
-const waitForFileScheme = new WaitForScheme('file');
+const waitForOutputScheme = waitForScheme('output');
+const waitForFileScheme = waitForScheme('file');
 
 const testCases: TestCase[] = [
   {

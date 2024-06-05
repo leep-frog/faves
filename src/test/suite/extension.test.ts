@@ -1,4 +1,4 @@
-import { PressItemButtonQuickPickAction, PressUnknownButtonQuickPickAction, SelectItemQuickPickAction, SimpleTestCase, SimpleTestCaseProps, UserInteraction, cmd, delay } from '@leep-frog/vscode-test-stubber';
+import { PressItemButtonQuickPickAction, PressUnknownButtonQuickPickAction, SelectItemQuickPickAction, SimpleTestCase, SimpleTestCaseProps, Waiter, cmd } from '@leep-frog/vscode-test-stubber';
 import * as vscode from 'vscode';
 import path = require('path');
 
@@ -27,18 +27,19 @@ function qpe<T extends vscode.QuickPickItem>(items: (T | string)[][]): (vscode.Q
 }
 
 // WaitForScheme is a UserInteraction that waits for the active text editor to have the provided scheme
-class WaitForScheme implements UserInteraction {
+class WaitForScheme extends Waiter {
 
   readonly scheme: 'output' | 'file';
 
+  delayIntervalMs: number = 5;
+
   constructor(scheme: 'output' | 'file') {
+    super();
     this.scheme = scheme;
   }
 
-  async do(): Promise<any> {
-    while (vscode.window.activeTextEditor?.document.uri.scheme !== this.scheme) {
-      await delay(10).do();
-    }
+  done(): boolean {
+    return vscode.window.activeTextEditor?.document.uri.scheme === this.scheme;
   }
 }
 

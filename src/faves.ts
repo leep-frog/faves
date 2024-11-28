@@ -5,8 +5,27 @@ import path = require('path');
 
 export interface Fave {
   path: string;
+  scheme: string;
   alias?: string;
 };
+
+interface SchemeHandler {
+  openDocument: (uri: vscode.Uri) => Promise<any>;
+}
+
+const SCHEME_HANDLERS = new Map<string, SchemeHandler>([
+  ["file", {
+    openDocument: async (uri: vscode.Uri): Promise<any> => {
+      await vscode.window.showTextDocument(uri);
+    },
+  }],
+  ["vscode-notebook-cell", {
+    openDocument: async (uri: vscode.Uri): Promise<any> => {
+      const nd = await vscode.workspace.openNotebookDocument(uri);
+      await vscode.window.showNotebookDocument(nd);
+    },
+  }],
+]);
 
 class RemoveFaveButton implements vscode.QuickInputButton {
   readonly iconPath: vscode.ThemeIcon;
@@ -133,7 +152,13 @@ export async function searchFaves(managers: FavesManager[], useAlias: boolean) {
         break;
       case 1:
         const selectedItem = input.selectedItems.at(0)!;
-        await vscode.window.showTextDocument(vscode.Uri.file(selectedItem.fsPath));
+
+        let scheme_handler = SCHEME_HANDLERS.get(selectedItem.fave.scheme);
+        if (!scheme_handler) {
+          vscode.window.showErrorMessage(`Selected fave with unsupported scheme (${selectedItem.fave.scheme}); defaulting to basic file open (delete and re-add this fave if this behavior is unexpected).`);
+          scheme_handler = SCHEME_HANDLERS.get("file")!;
+        }
+        await scheme_handler.openDocument(vscode.Uri.file(selectedItem.fsPath));
         break;
       default:
         vscode.window.showErrorMessage("Multiple selections made?!?!?");
@@ -174,6 +199,11 @@ abstract class FavesManager {
   }
 
   async add(f: vscode.Uri): Promise<void> {
+    if (!SCHEME_HANDLERS.has(f.scheme)) {
+      vscode.window.showErrorMessage(`${f.scheme} is an unsupported uri scheme`);
+      return;
+    }
+
     const p: string | undefined = this.uriToPath(f);
     if (!p) {
       return;
@@ -191,6 +221,7 @@ abstract class FavesManager {
 
     this.faves.set(p, {
       path: p,
+      scheme: f.scheme,
       // Remove whitespace and keep as undefined if empty after trimming.
       alias: alias?.trim() || undefined,
     });

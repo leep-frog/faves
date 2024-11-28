@@ -3,7 +3,7 @@
   "displayName": "faves",
   "description": "",
   "publisher": "groogle",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "dependencies": {
     "@leep-frog/vscode-test-stubber": "^1.11.5",
     "esbuild": "^0.20.2"

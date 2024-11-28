@@ -18,10 +18,6 @@ function executeOnUri(handler: (u: vscode.Uri) => void): void {
     vscode.window.showErrorMessage("No active text editor");
     return;
   }
-  if (uri.scheme !== "file") {
-    vscode.window.showErrorMessage("Currently, only file resources are supported");
-    return;
-  }
   handler(uri);
 }
 

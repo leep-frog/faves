@@ -62,7 +62,7 @@ const testCases: TestCase[] = [
         cmd('faves.add'),
       ],
       expectedErrorMessages: [
-        "Currently, only file resources are supported",
+        "output is an unsupported uri scheme",
       ],
     },
   },
@@ -87,6 +87,7 @@ const testCases: TestCase[] = [
               ['favorites', [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -123,6 +124,7 @@ const testCases: TestCase[] = [
               ['favorites', [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -159,6 +161,7 @@ const testCases: TestCase[] = [
               ['favorites', [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -195,6 +198,7 @@ const testCases: TestCase[] = [
               ['favorites', [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -231,6 +235,7 @@ const testCases: TestCase[] = [
               ['favorites', [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+                  scheme: "file",
                   alias: "bl oop",
                 },
               ]],
@@ -268,10 +273,12 @@ const testCases: TestCase[] = [
               ['favorites', [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+                  scheme: "file",
                   alias: 'other',
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'another.txt'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -285,12 +292,15 @@ const testCases: TestCase[] = [
               ['favorites', [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'another.txt'),
+                  scheme: "file",
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+                  scheme: "file",
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+                  scheme: "file",
                   alias: 'other',
                 },
               ]],
@@ -323,7 +333,7 @@ const testCases: TestCase[] = [
         cmd('faves.globalAdd'),
       ],
       expectedErrorMessages: [
-        "Currently, only file resources are supported",
+        "output is an unsupported uri scheme",
       ],
     },
   },
@@ -348,6 +358,7 @@ const testCases: TestCase[] = [
               ['globalFavorites', [
                 {
                   path: 'bloop.java',
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -397,6 +408,7 @@ const testCases: TestCase[] = [
               ['globalFavorites', [
                 {
                   path: 'bloop.java',
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -433,6 +445,7 @@ const testCases: TestCase[] = [
               ['globalFavorites', [
                 {
                   path: 'bloop.java',
+                  scheme: "file",
                   alias: "bl oop",
                 },
               ]],
@@ -470,6 +483,7 @@ const testCases: TestCase[] = [
               ['globalFavorites', [
                 {
                   path: path.join('nested', 'leaf.ts'),
+                  scheme: "file",
                   alias: "leave",
                 },
               ]],
@@ -507,10 +521,12 @@ const testCases: TestCase[] = [
               ['globalFavorites', [
                 {
                   path: 'other.py',
+                  scheme: "file",
                   alias: 'other',
                 },
                 {
                   path: 'another.txt',
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -524,12 +540,15 @@ const testCases: TestCase[] = [
               ['globalFavorites', [
                 {
                   path: 'another.txt',
+                  scheme: "file",
                 },
                 {
                   path: 'bloop.java',
+                  scheme: "file",
                 },
                 {
                   path: 'other.py',
+                  scheme: "file",
                   alias: 'other',
                 },
               ]],
@@ -552,7 +571,7 @@ const testCases: TestCase[] = [
     },
   },
   {
-    name: "Fails to remove if terminal focus",
+    name: "Tries to remove if unsupported scheme (terminal) focus",
     stc: {
       file: startingFile('bloop.java'),
       expectedText: [],
@@ -561,8 +580,8 @@ const testCases: TestCase[] = [
         waitForOutputScheme,
         cmd('faves.remove'),
       ],
-      expectedErrorMessages: [
-        "Currently, only file resources are supported",
+      expectedInfoMessages: [
+        `File does not exist in faves.favorites`,
       ],
     },
   },
@@ -598,13 +617,16 @@ const testCases: TestCase[] = [
               ['favorites', [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+                  scheme: "file",
                   alias: 'other',
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+                  scheme: "file",
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'another.txt'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -618,9 +640,11 @@ const testCases: TestCase[] = [
               ['favorites', [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'another.txt'),
+                  scheme: "file",
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+                  scheme: "file",
                   alias: 'other',
                 },
               ]],
@@ -643,7 +667,7 @@ const testCases: TestCase[] = [
     },
   },
   {
-    name: "[Global] Fails to remove if terminal focus",
+    name: "[Global] Tries to remove if unsupported scheme (terminal) focus",
     stc: {
       file: startingFile('bloop.java'),
       expectedText: [],
@@ -653,7 +677,7 @@ const testCases: TestCase[] = [
         cmd('faves.globalRemove'),
       ],
       expectedErrorMessages: [
-        "Currently, only file resources are supported",
+        `File is not in a workspace folder`,
       ],
     },
   },
@@ -702,13 +726,16 @@ const testCases: TestCase[] = [
               ['globalFavorites', [
                 {
                   path: 'other.py',
+                  scheme: "file",
                   alias: 'other',
                 },
                 {
                   path: 'bloop.java',
+                  scheme: "file",
                 },
                 {
                   path: 'another.txt',
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -722,9 +749,11 @@ const testCases: TestCase[] = [
               ['globalFavorites', [
                 {
                   path: 'another.txt',
+                  scheme: "file",
                 },
                 {
                   path: 'other.py',
+                  scheme: "file",
                   alias: 'other',
                 },
               ]],
@@ -763,6 +792,7 @@ const testCases: TestCase[] = [
               ['favorites', [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -789,13 +819,16 @@ const testCases: TestCase[] = [
               ['favorites', [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+                  scheme: "file",
                   alias: 'other',
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+                  scheme: "file",
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'another.txt'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -809,9 +842,11 @@ const testCases: TestCase[] = [
               ['favorites', [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'another.txt'),
+                  scheme: "file",
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+                  scheme: "file",
                   alias: 'other',
                 },
               ]],
@@ -863,6 +898,7 @@ const testCases: TestCase[] = [
               ['globalFavorites', [
                 {
                   path: 'bloop.java',
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -889,10 +925,12 @@ const testCases: TestCase[] = [
               ['globalFavorites', [
                 {
                   path: path.join('nested', 'tree.txt'),
+                  scheme: "file",
                   alias: 'walnut',
                 },
                 {
                   path: 'bloop.java',
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -906,6 +944,7 @@ const testCases: TestCase[] = [
               ['globalFavorites', [
                 {
                   path: 'bloop.java',
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -950,6 +989,7 @@ const testCases: TestCase[] = [
           description: "",
           fave: {
             path: path.join('another.txt'),
+            scheme: "file",
           },
           iconPath: {
             id: "globe",
@@ -971,6 +1011,7 @@ const testCases: TestCase[] = [
           description: "",
           fave: {
             path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+            scheme: "file",
           },
           iconPath: {
             id: "home",
@@ -992,6 +1033,7 @@ const testCases: TestCase[] = [
           description: "nested",
           fave: {
             path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts'),
+            scheme: "file",
           },
           iconPath: {
             id: "home",
@@ -1014,6 +1056,7 @@ const testCases: TestCase[] = [
           fave: {
             alias: 'othr',
             path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+            scheme: "file",
           },
           iconPath: {
             id: "home",
@@ -1036,6 +1079,7 @@ const testCases: TestCase[] = [
           fave: {
             alias: 'oak',
             path: path.join('nested', 'tree.txt'),
+            scheme: "file",
           },
           iconPath: {
             id: "globe",
@@ -1052,21 +1096,26 @@ const testCases: TestCase[] = [
               ['favorites', [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+                  scheme: "file",
                   alias: 'othr',
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+                  scheme: "file",
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts'),
+                  scheme: "file",
                 },
                 // Ignore file that doesn't exist
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'dne.txt'),
+                  scheme: "file",
                 },
                 // Ignore directory
                 {
                   path: pathResolve('..', '..', 'src', 'test'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -1076,18 +1125,22 @@ const testCases: TestCase[] = [
               ['globalFavorites', [
                 {
                   path: path.join('nested', 'tree.txt'),
+                  scheme: "file",
                   alias: 'oak',
                 },
                 {
                   path: path.join('another.txt'),
+                  scheme: "file",
                 },
                 // Ignore file that doesn't exist
                 {
                   path: path.join('other-folder', 'idk.py'),
+                  scheme: "file",
                 },
                 // Ignore directory
                 {
                   path: path.join('nested'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -1123,6 +1176,7 @@ const testCases: TestCase[] = [
           description: "",
           fave: {
             path: path.join('another.txt'),
+            scheme: "file",
           },
           iconPath: {
             id: "globe",
@@ -1144,6 +1198,7 @@ const testCases: TestCase[] = [
           description: "",
           fave: {
             path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+            scheme: "file",
           },
           iconPath: {
             id: "home",
@@ -1165,6 +1220,7 @@ const testCases: TestCase[] = [
           description: "nested",
           fave: {
             path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts'),
+            scheme: "file",
           },
           iconPath: {
             id: "home",
@@ -1187,6 +1243,7 @@ const testCases: TestCase[] = [
           fave: {
             alias: 'othr',
             path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+            scheme: "file",
           },
           iconPath: {
             id: "home",
@@ -1209,6 +1266,7 @@ const testCases: TestCase[] = [
           fave: {
             alias: 'oak',
             path: path.join('nested', 'tree.txt'),
+            scheme: "file",
           },
           iconPath: {
             id: "globe",
@@ -1225,17 +1283,21 @@ const testCases: TestCase[] = [
               ['favorites', [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+                  scheme: "file",
                   alias: 'othr',
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+                  scheme: "file",
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts'),
+                  scheme: "file",
                 },
                 // Ignore file that doesn't exist
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'dne.txt'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -1245,14 +1307,17 @@ const testCases: TestCase[] = [
               ['globalFavorites', [
                 {
                   path: path.join('nested', 'tree.txt'),
+                  scheme: "file",
                   alias: 'oak',
                 },
                 {
                   path: path.join('another.txt'),
+                  scheme: "file",
                 },
                 // Ignore file that doesn't exist
                 {
                   path: path.join('other-folder', 'idk.py'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -1289,6 +1354,7 @@ const testCases: TestCase[] = [
           description: "",
           fave: {
             path: path.join('another.txt'),
+            scheme: "file",
           },
           iconPath: {
             id: "globe",
@@ -1310,6 +1376,7 @@ const testCases: TestCase[] = [
           description: "",
           fave: {
             path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+            scheme: "file",
           },
           iconPath: {
             id: "home",
@@ -1331,6 +1398,7 @@ const testCases: TestCase[] = [
           description: pathResolve('..', '..', 'src'),
           fave: {
             path: pathResolve('..', '..', 'src', 'faves.ts'),
+            scheme: "file",
           },
           iconPath: {
             id: "home",
@@ -1352,6 +1420,7 @@ const testCases: TestCase[] = [
           description: "nested",
           fave: {
             path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts'),
+            scheme: "file",
           },
           iconPath: {
             id: "home",
@@ -1374,6 +1443,7 @@ const testCases: TestCase[] = [
           fave: {
             alias: 'othr',
             path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+            scheme: "file",
           },
           iconPath: {
             id: "home",
@@ -1396,6 +1466,7 @@ const testCases: TestCase[] = [
           fave: {
             alias: 'oak',
             path: path.join('nested', 'tree.txt'),
+            scheme: "file",
           },
           iconPath: {
             id: "globe",
@@ -1412,21 +1483,26 @@ const testCases: TestCase[] = [
               ['favorites', [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+                  scheme: "file",
                   alias: 'othr',
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+                  scheme: "file",
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts'),
+                  scheme: "file",
                 },
                 // File not in workspace
                 {
                   path: pathResolve('..', '..', 'src', 'faves.ts'),
+                  scheme: "file",
                 },
                 // Ignore file that doesn't exist
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'dne.txt'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -1436,18 +1512,136 @@ const testCases: TestCase[] = [
               ['globalFavorites', [
                 {
                   path: path.join('nested', 'tree.txt'),
+                  scheme: "file",
                   alias: 'oak',
                 },
                 {
                   path: path.join('another.txt'),
+                  scheme: "file",
                 },
                 // Ignore file that doesn't exist
                 {
                   path: path.join('other-folder', 'idk.py'),
+                  scheme: "file",
                 },
                 // Ignore directory
                 {
                   path: path.join('nested'),
+                  scheme: "file",
+                },
+              ]],
+            ])],
+          ])],
+        ]),
+      },
+    },
+  },
+  {
+    name: "Defaults to opening as a file if unsupported scheme",
+    stc: {
+      expectedText: [
+        // Contents of other.py
+        "# other",
+        '',
+      ],
+      expectedErrorMessages: [
+        `Selected fave with unsupported scheme (idk-scheme); defaulting to basic file open (delete and re-add this fave if this behavior is unexpected).`,
+      ],
+      userInteractions: [
+        cmd('faves.search'),
+        new SelectItemQuickPickAction([
+          'other.py',
+        ]),
+      ],
+      expectedQuickPicks: qpe([[
+        {
+          buttons: [
+            {
+              iconPath: {
+                id: "close",
+              },
+              tooltip: "Remove file from favorites list",
+            },
+          ],
+          description: "",
+          fave: {
+            alias: 'other',
+            path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+            scheme: "idk-scheme",
+          },
+          iconPath: {
+            id: "home",
+          },
+          label: "other.py",
+          manager: 'favorites',
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py')),
+        },
+      ]]),
+      workspaceConfiguration: {
+        configuration: new Map<vscode.ConfigurationTarget, Map<string, any>>([
+          [vscode.ConfigurationTarget.Workspace, new Map<string, any>([
+            ['faves', new Map<string, any>([
+              ['favorites', [
+                {
+                  path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+                  scheme: "idk-scheme",
+                  alias: 'other',
+                },
+              ]],
+            ])],
+          ])],
+        ]),
+      },
+    },
+  },
+  {
+    name: "Defaults to opening as a file if missing scheme",
+    stc: {
+      expectedText: [
+        // Contents of other.py
+        "# other",
+        '',
+      ],
+      expectedErrorMessages: [
+        `Selected fave with unsupported scheme (undefined); defaulting to basic file open (delete and re-add this fave if this behavior is unexpected).`,
+      ],
+      userInteractions: [
+        cmd('faves.search'),
+        new SelectItemQuickPickAction([
+          'other.py',
+        ]),
+      ],
+      expectedQuickPicks: qpe([[
+        {
+          buttons: [
+            {
+              iconPath: {
+                id: "close",
+              },
+              tooltip: "Remove file from favorites list",
+            },
+          ],
+          description: "",
+          fave: {
+            alias: 'other',
+            path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+          },
+          iconPath: {
+            id: "home",
+          },
+          label: "other.py",
+          manager: 'favorites',
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py')),
+        },
+      ]]),
+      workspaceConfiguration: {
+        configuration: new Map<vscode.ConfigurationTarget, Map<string, any>>([
+          [vscode.ConfigurationTarget.Workspace, new Map<string, any>([
+            ['faves', new Map<string, any>([
+              ['favorites', [
+                {
+                  path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+                  alias: 'other',
                 },
               ]],
             ])],
@@ -1486,6 +1680,7 @@ const testCases: TestCase[] = [
           fave: {
             alias: 'oak',
             path: path.join('nested', 'tree.txt'),
+            scheme: "file",
           },
           iconPath: {
             id: "globe",
@@ -1508,6 +1703,7 @@ const testCases: TestCase[] = [
           fave: {
             alias: 'othr',
             path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+            scheme: "file",
           },
           iconPath: {
             id: "home",
@@ -1524,17 +1720,21 @@ const testCases: TestCase[] = [
               ['favorites', [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+                  scheme: "file",
                   alias: 'othr',
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+                  scheme: "file",
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts'),
+                  scheme: "file",
                 },
                 // Ignore file that doesn't exist
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'dne.txt'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -1544,14 +1744,17 @@ const testCases: TestCase[] = [
               ['globalFavorites', [
                 {
                   path: path.join('nested', 'tree.txt'),
+                  scheme: "file",
                   alias: 'oak',
                 },
                 {
                   path: path.join('another.txt'),
+                  scheme: "file",
                 },
                 // Ignore file that doesn't exist
                 {
                   path: path.join('other-folder', 'idk.py'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -1589,6 +1792,7 @@ const testCases: TestCase[] = [
           fave: {
             alias: 'oak',
             path: path.join('nested', 'tree.txt'),
+            scheme: "file",
           },
           iconPath: {
             id: "globe",
@@ -1611,6 +1815,7 @@ const testCases: TestCase[] = [
           fave: {
             alias: 'othr',
             path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+            scheme: "file",
           },
           iconPath: {
             id: "home",
@@ -1627,17 +1832,21 @@ const testCases: TestCase[] = [
               ['favorites', [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+                  scheme: "file",
                   alias: 'othr',
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+                  scheme: "file",
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts'),
+                  scheme: "file",
                 },
                 // Ignore file that doesn't exist
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'dne.txt'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -1647,14 +1856,17 @@ const testCases: TestCase[] = [
               ['globalFavorites', [
                 {
                   path: path.join('nested', 'tree.txt'),
+                  scheme: "file",
                   alias: 'oak',
                 },
                 {
                   path: path.join('another.txt'),
+                  scheme: "file",
                 },
                 // Ignore file that doesn't exist
                 {
                   path: path.join('other-folder', 'idk.py'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -1691,6 +1903,7 @@ const testCases: TestCase[] = [
           fave: {
             alias: 'oak',
             path: path.join('nested', 'tree.txt'),
+            scheme: "file",
           },
           iconPath: {
             id: "globe",
@@ -1713,6 +1926,7 @@ const testCases: TestCase[] = [
           fave: {
             alias: 'othr',
             path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+            scheme: "file",
           },
           iconPath: {
             id: "home",
@@ -1730,17 +1944,21 @@ const testCases: TestCase[] = [
               ['favorites', [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+                  scheme: "file",
                   alias: 'othr',
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+                  scheme: "file",
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts'),
+                  scheme: "file",
                 },
                 // Ignore file that doesn't exist
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'dne.txt'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -1750,14 +1968,17 @@ const testCases: TestCase[] = [
               ['globalFavorites', [
                 {
                   path: path.join('nested', 'tree.txt'),
+                  scheme: "file",
                   alias: 'oak',
                 },
                 {
                   path: path.join('another.txt'),
+                  scheme: "file",
                 },
                 // Ignore file that doesn't exist
                 {
                   path: path.join('other-folder', 'idk.py'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -1772,17 +1993,21 @@ const testCases: TestCase[] = [
               ['favorites', [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+                  scheme: "file",
                   alias: 'othr',
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+                  scheme: "file",
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts'),
+                  scheme: "file",
                 },
                 // Ignore file that doesn't exist
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'dne.txt'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -1792,10 +2017,12 @@ const testCases: TestCase[] = [
               ['globalFavorites', [
                 {
                   path: path.join('another.txt'),
+                  scheme: "file",
                 },
                 // Ignore file that doesn't exist
                 {
                   path: path.join('other-folder', 'idk.py'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -1832,6 +2059,7 @@ const testCases: TestCase[] = [
           fave: {
             alias: 'oak',
             path: path.join('nested', 'tree.txt'),
+            scheme: "file",
           },
           iconPath: {
             id: "globe",
@@ -1854,6 +2082,7 @@ const testCases: TestCase[] = [
           fave: {
             alias: 'othr',
             path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+            scheme: "file",
           },
           iconPath: {
             id: "home",
@@ -1870,17 +2099,21 @@ const testCases: TestCase[] = [
               ['favorites', [
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+                  scheme: "file",
                   alias: 'othr',
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+                  scheme: "file",
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts'),
+                  scheme: "file",
                 },
                 // Ignore file that doesn't exist
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'dne.txt'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -1890,14 +2123,17 @@ const testCases: TestCase[] = [
               ['globalFavorites', [
                 {
                   path: path.join('nested', 'tree.txt'),
+                  scheme: "file",
                   alias: 'oak',
                 },
                 {
                   path: path.join('another.txt'),
+                  scheme: "file",
                 },
                 // Ignore file that doesn't exist
                 {
                   path: path.join('other-folder', 'idk.py'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -1912,12 +2148,15 @@ const testCases: TestCase[] = [
                 // other.py was removed from here!
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+                  scheme: "file",
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'dne.txt'),
+                  scheme: "file",
                 },
                 {
                   path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts'),
+                  scheme: "file",
                 },
               ]],
             ])],
@@ -1927,14 +2166,113 @@ const testCases: TestCase[] = [
               ['globalFavorites', [
                 {
                   path: path.join('nested', 'tree.txt'),
+                  scheme: "file",
                   alias: 'oak',
                 },
                 {
                   path: path.join('another.txt'),
+                  scheme: "file",
                 },
                 // Ignore file that doesn't exist
                 {
                   path: path.join('other-folder', 'idk.py'),
+                  scheme: "file",
+                },
+              ]],
+            ])],
+          ])],
+        ]),
+      },
+    },
+  },
+  // Notebook tests
+  // Unfortunately, these don't work, but they were manually tested which is fine enough
+  /*{
+    name: "Successfully adds a notebook",
+    stc: {
+      // file: startingFile('simple-notebook.ipynb'),
+      expectedText: [],
+      userInteractions: [
+        openFile(startingFile('simple-notebook.ipynb')),
+        cmd('faves.add'),
+      ],
+      expectedInfoMessages: [
+        'simple-notebook.ipynb was added to faves.favorites',
+      ],
+      expectedInputBoxes: [
+        {
+          options: {
+            placeHolder: 'alias (leave blank for no alias)',
+            prompt: 'Fave alias',
+            validateInputProvided: false,
+          },
+        },
+      ],
+      inputBoxResponses: ['nb'],
+      expectedWorkspaceConfiguration: {
+        configuration: new Map<vscode.ConfigurationTarget, Map<string, any>>([
+          [vscode.ConfigurationTarget.Workspace, new Map<string, any>([
+            ['faves', new Map<string, any>([
+              ['favorites', [
+                {
+                  path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'simple-notebook.ipynb'),
+                  scheme: "vscode-notebook-cell",
+                  alias: "nb",
+                },
+              ]],
+            ])],
+          ])],
+        ]),
+      },
+    },
+  },
+  {
+    name: "Opens a notebook properly",
+    stc: {
+      expectedText: [
+        // Contents of other.py
+        "# other",
+        '',
+      ],
+      userInteractions: [
+        cmd('faves.search'),
+        new SelectItemQuickPickAction([
+          'simple-notebook.ipynb',
+        ]),
+      ],
+      expectedQuickPicks: qpe([[
+        {
+          buttons: [
+            {
+              iconPath: {
+                id: "close",
+              },
+              tooltip: "Remove file from favorites list",
+            },
+          ],
+          description: "",
+          fave: {
+            alias: 'nb',
+            path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'simple-notebook.ipynb'),
+            scheme: "vscode-notebook-cell",
+          },
+          iconPath: {
+            id: "home",
+          },
+          label: "simple-notebook.ipynb",
+          manager: 'favorites',
+          fsPath: uriFile(pathResolve('..', '..', 'src', 'test', 'test-workspace', 'simple-notebook.ipynb')),
+        },
+      ]]),
+      workspaceConfiguration: {
+        configuration: new Map<vscode.ConfigurationTarget, Map<string, any>>([
+          [vscode.ConfigurationTarget.Workspace, new Map<string, any>([
+            ['faves', new Map<string, any>([
+              ['favorites', [
+                {
+                  path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'simple-notebook.ipynb'),
+                  scheme: "vscode-notebook-cell",
+                  alias: 'nb',
                 },
               ]],
             ])],

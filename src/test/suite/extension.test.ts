@@ -2289,11 +2289,7 @@ suite('Extension Test Suite', () => {
 
   const requireSolo = testCases.some(tc => tc.runSolo);
 
-  testCases.forEach(tc => {
-
-    if (requireSolo && !tc.runSolo) {
-      return;
-    }
+  testCases.filter(tc => !requireSolo || tc.runSolo).forEach(tc => {
 
     test(tc.name, async () => {
 

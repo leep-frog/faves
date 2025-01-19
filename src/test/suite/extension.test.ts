@@ -1939,7 +1939,7 @@ const testCases: TestCase[] = [
       workspaceConfiguration: {
         configuration: new Map<vscode.ConfigurationTarget, Map<string, any>>([
           [vscode.ConfigurationTarget.Workspace, new Map<string, any>([
-          // TODO: [vscode.ConfigurationTarget.Workspace, new Map<string, any>([
+            // TODO: [vscode.ConfigurationTarget.Workspace, new Map<string, any>([
             ['faves', new Map<string, any>([
               ['favorites', [
                 {
@@ -1988,7 +1988,7 @@ const testCases: TestCase[] = [
       expectedWorkspaceConfiguration: {
         configuration: new Map<vscode.ConfigurationTarget, Map<string, any>>([
           [vscode.ConfigurationTarget.Workspace, new Map<string, any>([
-          // TODO: [vscode.ConfigurationTarget.Workspace, new Map<string, any>([
+            // TODO: [vscode.ConfigurationTarget.Workspace, new Map<string, any>([
             ['faves', new Map<string, any>([
               ['favorites', [
                 {

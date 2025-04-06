@@ -1763,6 +1763,130 @@ const testCases: TestCase[] = [
       },
     },
   },
+  {
+    name: "Alias search with alias arg works",
+    stc: {
+      expectedText: [
+        // Contents of other.py
+        '# other',
+        '',
+      ],
+      userInteractions: [
+        cmd('faves.aliasSearch', {
+          alias: "othr",
+        }),
+      ],
+      workspaceConfiguration: {
+        configuration: new Map<vscode.ConfigurationTarget, Map<string, any>>([
+          [vscode.ConfigurationTarget.Workspace, new Map<string, any>([
+            ['faves', new Map<string, any>([
+              ['favorites', [
+                {
+                  path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+                  scheme: "file",
+                  alias: 'othr',
+                },
+                {
+                  path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+                  scheme: "file",
+                },
+                {
+                  path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts'),
+                  scheme: "file",
+                },
+                // Ignore file that doesn't exist
+                {
+                  path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'dne.txt'),
+                  scheme: "file",
+                },
+              ]],
+            ])],
+          ])],
+          [vscode.ConfigurationTarget.Global, new Map<string, any>([
+            ['faves', new Map<string, any>([
+              ['globalFavorites', [
+                {
+                  path: path.join('nested', 'tree.txt'),
+                  scheme: "file",
+                  alias: 'oak',
+                },
+                {
+                  path: path.join('another.txt'),
+                  scheme: "file",
+                },
+                // Ignore file that doesn't exist
+                {
+                  path: path.join('other-folder', 'idk.py'),
+                  scheme: "file",
+                },
+              ]],
+            ])],
+          ])],
+        ]),
+      },
+    },
+  },
+  {
+    name: "Alias search with unknown alias fails",
+    stc: {
+      userInteractions: [
+        cmd('faves.aliasSearch', {
+          alias: "idk",
+        }),
+      ],
+      expectedErrorMessages: [
+        "Unknown alias idk (provided by command args)",
+      ],
+      workspaceConfiguration: {
+        configuration: new Map<vscode.ConfigurationTarget, Map<string, any>>([
+          [vscode.ConfigurationTarget.Workspace, new Map<string, any>([
+            ['faves', new Map<string, any>([
+              ['favorites', [
+                {
+                  path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'other.py'),
+                  scheme: "file",
+                  alias: 'othr',
+                },
+                {
+                  path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'bloop.java'),
+                  scheme: "file",
+                },
+                {
+                  path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'nested', 'leaf.ts'),
+                  scheme: "file",
+                },
+                // Ignore file that doesn't exist
+                {
+                  path: pathResolve('..', '..', 'src', 'test', 'test-workspace', 'dne.txt'),
+                  scheme: "file",
+                },
+              ]],
+            ])],
+          ])],
+          [vscode.ConfigurationTarget.Global, new Map<string, any>([
+            ['faves', new Map<string, any>([
+              ['globalFavorites', [
+                {
+                  path: path.join('nested', 'tree.txt'),
+                  scheme: "file",
+                  alias: 'oak',
+                },
+                {
+                  path: path.join('another.txt'),
+                  scheme: "file",
+                },
+                // Ignore file that doesn't exist
+                {
+                  path: path.join('other-folder', 'idk.py'),
+                  scheme: "file",
+                },
+              ]],
+            ])],
+          ])],
+        ]),
+      },
+    },
+  },
   // Search button tests
   {
     name: "Handles unknown button",

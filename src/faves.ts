@@ -36,6 +36,10 @@ class RemoveFaveButton implements vscode.QuickInputButton {
   }
 }
 
+export interface SearchAliasArgs {
+  alias?: string;
+}
+
 export interface FaveItem extends vscode.QuickPickItem {
   fave: Fave;
   // Comparing Uri in assertions led to awkward comparison failures due to internal workings of
@@ -44,7 +48,34 @@ export interface FaveItem extends vscode.QuickPickItem {
   manager: FavesManager;
 }
 
-export async function searchFaves(managers: FavesManager[], useAlias: boolean) {
+async function openFave(fave: Fave, fsPath: string) {
+  let scheme_handler = SCHEME_HANDLERS.get(fave.scheme);
+  if (!scheme_handler) {
+    vscode.window.showErrorMessage(`Selected fave with unsupported scheme (${fave.scheme}); defaulting to basic file open (delete and re-add this fave if this behavior is unexpected).`);
+    scheme_handler = SCHEME_HANDLERS.get("file")!;
+  }
+  await scheme_handler.openDocument(vscode.Uri.file(fsPath));
+}
+
+export async function searchFaves(managers: FavesManager[], useAlias: boolean, args?: SearchAliasArgs) {
+  if (useAlias && args?.alias) {
+    for (const manager of managers) {
+      for (const fave of manager.orderedFaves()) {
+        if (fave.alias === args.alias) {
+          const uris = manager.faveToURIs(fave);
+          if (uris.length !== 1) {
+            vscode.window.showErrorMessage(`Fave with alias ${args.alias} has ${uris.length} URIs; expected 1`);
+            return;
+          }
+          const uri = uris[0];
+          await openFave(fave, uri.fsPath);
+          return;
+        }
+      }
+    }
+    vscode.window.showErrorMessage(`Unknown alias ${args.alias} (provided by command args)`);
+    return;
+  }
 
   const items: FaveItem[] = [];
   for (const manager of managers) {
@@ -130,16 +161,16 @@ export async function searchFaves(managers: FavesManager[], useAlias: boolean) {
     // Handle the item-level buttons
     input.onDidTriggerItemButton(async event => {
       switch (event.button.constructor) {
-      case RemoveFaveButton:
-        await event.item.manager.removePath(event.item.fave.path);
-        const index = input.items.indexOf(event.item);
-        input.items = [
-          ...input.items.slice(0, index),
-          ...input.items.slice(index+1, input.items.length),
-        ];
-        break;
-      default:
-        vscode.window.showErrorMessage(`Unknown item button`);
+        case RemoveFaveButton:
+          await event.item.manager.removePath(event.item.fave.path);
+          const index = input.items.indexOf(event.item);
+          input.items = [
+            ...input.items.slice(0, index),
+            ...input.items.slice(index + 1, input.items.length),
+          ];
+          break;
+        default:
+          vscode.window.showErrorMessage(`Unknown item button`);
       }
     }),
 
@@ -147,22 +178,17 @@ export async function searchFaves(managers: FavesManager[], useAlias: boolean) {
     input.onDidAccept(async e => {
       input.dispose();
       switch (input.selectedItems.length) {
-      case 0:
-        vscode.window.showInformationMessage("No selection made");
-        break;
-      case 1:
-        const selectedItem = input.selectedItems.at(0)!;
+        case 0:
+          vscode.window.showInformationMessage("No selection made");
+          break;
+        case 1:
+          const selectedItem = input.selectedItems.at(0)!;
 
-        let scheme_handler = SCHEME_HANDLERS.get(selectedItem.fave.scheme);
-        if (!scheme_handler) {
-          vscode.window.showErrorMessage(`Selected fave with unsupported scheme (${selectedItem.fave.scheme}); defaulting to basic file open (delete and re-add this fave if this behavior is unexpected).`);
-          scheme_handler = SCHEME_HANDLERS.get("file")!;
-        }
-        await scheme_handler.openDocument(vscode.Uri.file(selectedItem.fsPath));
-        break;
-      default:
-        vscode.window.showErrorMessage("Multiple selections made?!?!?");
-        break;
+          await openFave(selectedItem.fave, selectedItem.fsPath);
+          break;
+        default:
+          vscode.window.showErrorMessage("Multiple selections made?!?!?");
+          break;
       }
     }),
 

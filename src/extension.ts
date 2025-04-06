@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { GlobalFavesManager, WorkspaceFavesManager, searchFaves } from './faves';
+import { GlobalFavesManager, SearchAliasArgs, WorkspaceFavesManager, searchFaves } from './faves';
 
 const workspaceFaves = new WorkspaceFavesManager();
 const globalFaves = new GlobalFavesManager();
@@ -37,9 +37,9 @@ export function activate(context: vscode.ExtensionContext) {
     workspaceFaves, globalFaves,
   ], false)));
 
-  context.subscriptions.push(vscode.commands.registerCommand('faves.aliasSearch', () => searchFaves([
+  context.subscriptions.push(vscode.commands.registerCommand('faves.aliasSearch', (args?: SearchAliasArgs) => searchFaves([
     workspaceFaves, globalFaves,
-  ], true)));
+  ], true, args)));
 
   vscode.workspace.onDidChangeConfiguration(e => {
     if (e.affectsConfiguration("faves")) {
